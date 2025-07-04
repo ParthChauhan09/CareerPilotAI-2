@@ -4,6 +4,8 @@ import Link from 'next/link'
 
 // Force dynamic rendering to avoid SSG issues with React 19
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+export const revalidate = 0
 
 export default function NotFound() {
   return (
