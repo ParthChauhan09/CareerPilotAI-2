@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
@@ -101,9 +101,9 @@ function DashboardWelcome({
   )
 }
 
-export default function DashboardPage() {
+// Component that uses useSearchParams
+function DashboardContent() {
   const { isAuthenticated, loading: authLoading, user } = useAuth()
-  // const router = useRouter() // Not needed for now
   const searchParams = useSearchParams()
   const tabParam = searchParams.get('tab') as DocumentType | null
 
@@ -401,5 +401,23 @@ export default function DashboardPage() {
         />
       </div>
     </DashboardShell>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen items-center justify-center bg-gradient-to-b from-background to-background/90">
+        <div className="flex flex-col items-center gap-4 animate-fade-in">
+          <div className="relative">
+            <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 opacity-20 blur-lg animate-pulse"></div>
+            <Loader2 className="h-12 w-12 animate-spin text-primary relative" />
+          </div>
+          <p className="text-sm text-muted-foreground animate-pulse">Loading your dashboard...</p>
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   )
 }
