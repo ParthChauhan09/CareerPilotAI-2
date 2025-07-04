@@ -1,5 +1,8 @@
 "use client"
 
+// Force dynamic rendering to avoid SSG issues with React 19
+export const dynamic = 'force-dynamic'
+
 import { DashboardShell } from "@/components/dashboard-shell"
 import { DashboardHeader } from "@/components/dashboard-header"
 

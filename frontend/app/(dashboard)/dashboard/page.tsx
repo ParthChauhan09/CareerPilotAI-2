@@ -3,6 +3,9 @@
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+
+// Force dynamic rendering to avoid SSG issues with React 19
+export const dynamic = 'force-dynamic'
 import { useAuth } from "@/lib/auth-context"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { DashboardHeader } from "@/components/dashboard-header"

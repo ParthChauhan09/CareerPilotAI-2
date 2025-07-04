@@ -1,3 +1,6 @@
+// Force dynamic rendering to avoid SSG issues with React 19
+export const dynamic = 'force-dynamic'
+
 import { LandingHero } from "@/components/landing-hero"
 import { LandingFeatures } from "@/components/landing-features"
 import { LandingPricing } from "@/components/landing-pricing"

@@ -1,5 +1,8 @@
 "use client"
 
+// Force dynamic rendering to avoid SSG issues with React 19
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { DashboardShell } from "@/components/dashboard-shell"

@@ -1,4 +1,9 @@
+'use client'
+
 import Link from 'next/link'
+
+// Force dynamic rendering to avoid SSG issues with React 19
+export const dynamic = 'force-dynamic'
 
 export default function NotFound() {
   return (
