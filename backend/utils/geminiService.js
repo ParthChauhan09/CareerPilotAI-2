@@ -181,16 +181,22 @@ if (initSuccess) {
         return;
       }
 
-      // Perform a small test generation
-      const result = await model.generateContent({
-        contents: [
-          { role: "user", parts: [{ text: "Hello, are you working?" }] },
-        ],
-        generationConfig: {
-          temperature: 0.2,
-          maxOutputTokens: 50,
+      // Perform a small test generation with retry logic
+      const result = await retryWithBackoff(
+        async () => {
+          return await model.generateContent({
+            contents: [
+              { role: "user", parts: [{ text: "Hello, are you working?" }] },
+            ],
+            generationConfig: {
+              temperature: 0.2,
+              maxOutputTokens: 50,
+            },
+          });
         },
-      });
+        2,
+        2000
+      ); // Use 2 retries with 2 second base delay for test
 
       // Check for a valid response
       if (result && result.response && result.response.text()) {
@@ -302,10 +308,59 @@ The system is using a local fallback mechanism to ensure you receive some conten
 };
 
 /**
+ * Sleep function for retry delays
+ * @param {number} ms - Milliseconds to sleep
+ * @returns {Promise} - Promise that resolves after the delay
+ */
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Retry function with exponential backoff for API calls
+ * @param {Function} fn - Function to retry
+ * @param {number} maxRetries - Maximum number of retries
+ * @param {number} baseDelay - Base delay in milliseconds
+ * @returns {Promise} - Result of the function or throws last error
+ */
+const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 1000) => {
+  let lastError;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+
+      // Check if it's a retryable error (503, 429, network errors)
+      const isRetryable =
+        error.message?.includes("503") ||
+        error.message?.includes("Service Unavailable") ||
+        error.message?.includes("overloaded") ||
+        error.message?.includes("429") ||
+        error.message?.includes("Rate limit") ||
+        error.message?.includes("ECONNRESET") ||
+        error.message?.includes("ETIMEDOUT");
+
+      if (!isRetryable || attempt === maxRetries) {
+        throw lastError;
+      }
+
+      // Calculate delay with exponential backoff and jitter
+      const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000;
+      console.log(
+        `Attempt ${attempt + 1} failed, retrying in ${Math.round(delay)}ms...`
+      );
+      await sleep(delay);
+    }
+  }
+
+  throw lastError;
+};
+
+/**
  * Generate content using Gemini with error handling and fallback.
- * Enhanced with Canvas support for better formatting.
+ * Enhanced with Canvas support for better formatting and retry logic.
  * @param {string} prompt - The prompt to send to Gemini
- * @param {Object} options - Additional options (temperature, maxOutputTokens, modelName, useCanvas)
+ * @param {Object} options - Additional options (temperature, maxOutputTokens, modelName, useCanvas, maxRetries)
  * @returns {Promise<string>} - The generated content
  */
 const generateContent = async (prompt, options = {}) => {
@@ -322,6 +377,8 @@ const generateContent = async (prompt, options = {}) => {
     textColor = "#333333", // Default text color
     backgroundColor = "#FFFFFF", // Default background color
     padding = 20, // Default padding
+    maxRetries = 3, // Maximum number of retries for API calls
+    baseDelay = 1000, // Base delay for retry backoff
   } = options;
 
   // If forced local fallback or API is not initialized/functional, use fallback
@@ -375,11 +432,12 @@ const generateContent = async (prompt, options = {}) => {
       `Generating content with ${selectedModelName}, max tokens: ${maxOutputTokens}, temperature: ${temperature}`
     );
 
-    let result;
-
-    if (useCanvas) {
-      // Enhanced prompt for Canvas-based formatting
-      const canvasPrompt = `
+    // Wrap API calls with retry logic
+    const result = await retryWithBackoff(
+      async () => {
+        if (useCanvas) {
+          // Enhanced prompt for Canvas-based formatting
+          const canvasPrompt = `
 Format the following content for a professional document with clear section headers,
 proper spacing, and consistent formatting. Use appropriate styling for headings,
 bullet points, and paragraphs:
@@ -391,41 +449,45 @@ Please ensure:
 - Proper spacing between sections
 - Consistent bullet point formatting
 - Professional appearance suitable for ${
-        prompt.includes("resume")
-          ? "a resume"
-          : prompt.includes("cover letter")
-          ? "a cover letter"
-          : prompt.includes("linkedin")
-          ? "a LinkedIn profile"
-          : "a professional document"
-      }
+            prompt.includes("resume")
+              ? "a resume"
+              : prompt.includes("cover letter")
+              ? "a cover letter"
+              : prompt.includes("linkedin")
+              ? "a LinkedIn profile"
+              : "a professional document"
+          }
 `;
 
-      // Use structured format for better control
-      result = await model.generateContent({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: canvasPrompt }],
-          },
-        ],
-        generationConfig: {
-          temperature,
-          maxOutputTokens,
-          // Add structured output parameters if needed
-          // structuredOutputSchema: {...}
-        },
-      });
-    } else {
-      // Standard text generation
-      result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature,
-          maxOutputTokens,
-        },
-      });
-    }
+          // Use structured format for better control
+          return await model.generateContent({
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: canvasPrompt }],
+              },
+            ],
+            generationConfig: {
+              temperature,
+              maxOutputTokens,
+              // Add structured output parameters if needed
+              // structuredOutputSchema: {...}
+            },
+          });
+        } else {
+          // Standard text generation
+          return await model.generateContent({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature,
+              maxOutputTokens,
+            },
+          });
+        }
+      },
+      maxRetries,
+      baseDelay
+    );
 
     // Check for a valid response
     if (!result || !result.response || !result.response.text()) {

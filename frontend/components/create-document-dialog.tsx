@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { ResumeForm } from "@/components/forms/resume-form"
 import { CoverLetterForm } from "@/components/forms/cover-letter-form"
 import { LinkedInForm } from "@/components/forms/linkedin-form"
@@ -32,7 +32,7 @@ export function CreateDocumentDialog({
   documentType,
   onDocumentCreated,
 }: CreateDocumentDialogProps) {
-  const [activeTab, setActiveTab] = useState<string>("basic")
+
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -267,19 +267,9 @@ export function CreateDocumentDialog({
         </DialogHeader>
 
         <div className="py-2">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="basic">Basic Info</TabsTrigger>
-              <TabsTrigger value="advanced">Advanced Options</TabsTrigger>
-            </TabsList>
-            <TabsContent value="basic" className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto pr-1 pb-2">
-              {renderForm()}
-            </TabsContent>
-            <TabsContent value="advanced" className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto pr-1 pb-2">
-              {/* Advanced options will be rendered based on document type */}
-              {renderForm()}
-            </TabsContent>
-          </Tabs>
+          <div className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto pr-1 pb-2">
+            {renderForm()}
+          </div>
         </div>
 
         <DialogFooter className="border-t pt-4 mt-2">
