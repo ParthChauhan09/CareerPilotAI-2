@@ -2,3 +2,4 @@
 export default function Custom500() {
   return null; // Return nothing to avoid rendering issues
 }
+
