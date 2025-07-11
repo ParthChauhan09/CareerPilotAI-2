@@ -15,13 +15,7 @@ const app = express();
 
 // Middleware
 //app.use(cors());
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // if you use cookies/sessions
-  })
-);
+app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
 // Special handling for Stripe webhook
