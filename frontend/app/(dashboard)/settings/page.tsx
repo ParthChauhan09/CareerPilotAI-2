@@ -12,7 +12,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { userAPI } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Lock, Eye, EyeOff, Mail, Moon, Sun } from "lucide-react"
+import { Loader2, Lock, Eye, EyeOff, Mail, Moon, Sun, FileText, ExternalLink } from "lucide-react"
+import Link from "next/link"
 import { useTheme } from "next-themes"
 
 export default function SettingsPage() {
@@ -77,6 +78,7 @@ export default function SettingsPage() {
         <TabsList>
           <TabsTrigger value="privacy">Privacy</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="legal">Legal</TabsTrigger>
         </TabsList>
 
         <TabsContent value="privacy" className="space-y-4">
@@ -199,6 +201,89 @@ export default function SettingsPage() {
                 </div>
               </CardContent>
             )}
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="legal" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                <span>Legal Information</span>
+              </CardTitle>
+              <CardDescription>
+                Review our policies and legal documents
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-3">
+                  <h4 className="font-medium">Policies</h4>
+                  <div className="space-y-2">
+                    <Link
+                      href="/privacy-policy"
+                      className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors group"
+                      target="_blank"
+                    >
+                      <div>
+                        <p className="font-medium">Privacy Policy</p>
+                        <p className="text-sm text-muted-foreground">How we collect and use your data</p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
+                    </Link>
+                    <Link
+                      href="/terms-and-conditions"
+                      className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors group"
+                      target="_blank"
+                    >
+                      <div>
+                        <p className="font-medium">Terms & Conditions</p>
+                        <p className="text-sm text-muted-foreground">Service terms and user agreements</p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
+                    </Link>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="font-medium">Support</h4>
+                  <div className="space-y-2">
+                    <Link
+                      href="/cancellation-refund"
+                      className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors group"
+                      target="_blank"
+                    >
+                      <div>
+                        <p className="font-medium">Refund Policy</p>
+                        <p className="text-sm text-muted-foreground">Cancellation and refund terms</p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
+                    </Link>
+                    <Link
+                      href="/shipping-delivery"
+                      className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors group"
+                      target="_blank"
+                    >
+                      <div>
+                        <p className="font-medium">Delivery Policy</p>
+                        <p className="text-sm text-muted-foreground">Digital service delivery terms</p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
+                    </Link>
+                    <Link
+                      href="/contact-us"
+                      className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors group"
+                      target="_blank"
+                    >
+                      <div>
+                        <p className="font-medium">Contact Us</p>
+                        <p className="text-sm text-muted-foreground">Get help and support</p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>

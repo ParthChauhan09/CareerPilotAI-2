@@ -10,9 +10,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "This is the backend application for CareerPilotAI, built with Node.js, Express, and MongoDB.",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "docx": "^9.5.0",
@@ -23,8 +24,8 @@
     "mongoose": "^8.14.2",
     "openai": "^4.98.0",
     "puppeteer": "^24.8.2",
-    "sanitize-html": "^2.17.0",
-    "stripe": "^18.1.0"
+    "razorpay": "^2.9.6",
+    "sanitize-html": "^2.17.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

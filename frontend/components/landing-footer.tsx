@@ -66,17 +66,27 @@ export function LandingFooter() {
             <h3 className="text-sm font-medium">Legal</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/terms" className="text-muted-foreground transition-colors hover:text-foreground">
-                  Terms of Service
+                <Link href="/terms-and-conditions" className="text-muted-foreground transition-colors hover:text-foreground">
+                  Terms & Conditions
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-muted-foreground transition-colors hover:text-foreground">
+                <Link href="/privacy-policy" className="text-muted-foreground transition-colors hover:text-foreground">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-muted-foreground transition-colors hover:text-foreground">
+                <Link href="/cancellation-refund" className="text-muted-foreground transition-colors hover:text-foreground">
+                  Refund Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/shipping-delivery" className="text-muted-foreground transition-colors hover:text-foreground">
+                  Delivery Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact-us" className="text-muted-foreground transition-colors hover:text-foreground">
                   Contact Us
                 </Link>
               </li>

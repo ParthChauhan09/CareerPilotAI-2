@@ -18,7 +18,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-// Special handling for Stripe webhook
+// Special handling for Razorpay webhook
 app.use("/api/payment/webhook", express.raw({ type: "application/json" }));
 
 // Routes

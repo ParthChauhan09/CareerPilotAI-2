@@ -115,10 +115,72 @@ export default function SubscriptionPage() {
   const handleSubscribe = async (planType: string) => {
     setSubscribing(true)
     try {
-      const res = await paymentAPI.createCheckoutSession({ planType })
+      const res = await paymentAPI.createOrder({ planType })
+      const { orderId, amount, currency, keyId, planName, userEmail, userName } = res.data
 
-      // Redirect to Stripe checkout
-      window.location.href = res.data.url
+      // Initialize Razorpay checkout
+      const options = {
+        key: keyId,
+        amount: amount,
+        currency: currency,
+        name: "CareerPilotAI",
+        description: `Upgrade to ${planName} Plan`,
+        order_id: orderId,
+        prefill: {
+          name: userName,
+          email: userEmail,
+        },
+        theme: {
+          color: "#3B82F6",
+        },
+        handler: async function (response: any) {
+          try {
+            // Verify payment on backend
+            await paymentAPI.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              planType: planType,
+            })
+
+            toast({
+              title: "Payment successful!",
+              description: `You have successfully upgraded to the ${planName} plan.`,
+            })
+
+            // Refresh the page to show updated plan
+            window.location.reload()
+          } catch (error) {
+            toast({
+              title: "Payment verification failed",
+              description: "Please contact support if the amount was deducted.",
+              variant: "destructive",
+            })
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setSubscribing(false)
+          },
+        },
+      }
+
+      // Load Razorpay script and open checkout
+      const script = document.createElement("script")
+      script.src = "https://checkout.razorpay.com/v1/checkout.js"
+      script.onload = () => {
+        const rzp = new (window as any).Razorpay(options)
+        rzp.open()
+      }
+      script.onerror = () => {
+        toast({
+          title: "Payment gateway error",
+          description: "Failed to load payment gateway. Please try again.",
+          variant: "destructive",
+        })
+        setSubscribing(false)
+      }
+      document.body.appendChild(script)
     } catch (error) {
       toast({
         title: "Subscription failed",

@@ -14,7 +14,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api
 NEXT_PUBLIC_APP_NAME=CareerPilotAI
 NEXT_PUBLIC_APP_VERSION=1.0.0
 
-# Pricing Configuration (in Indian Rupees)
+# Pricing Configuration (in Indian Rupees - for Razorpay integration)
 NEXT_PUBLIC_BASIC_PLAN_PRICE=499
 NEXT_PUBLIC_PREMIUM_PLAN_PRICE=999
 
@@ -41,16 +41,19 @@ NODE_ENV=development
 ## Getting Started
 
 1. Copy the environment file:
+
    ```bash
    cp .env.example .env.local
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Start the development server:
+
    ```bash
    npm run dev
    ```

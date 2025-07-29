@@ -120,7 +120,14 @@ export const linkedinAPI = {
 export const paymentAPI = {
   getPlans: () => api.get("/payment/plans"),
 
-  createCheckoutSession: (planData: { planType: string }) => api.post("/payment/create-checkout-session", planData),
+  createOrder: (planData: { planType: string }) => api.post("/payment/create-order", planData),
+
+  verifyPayment: (paymentData: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+    planType: string;
+  }) => api.post("/payment/verify", paymentData),
 }
 
 export default api
