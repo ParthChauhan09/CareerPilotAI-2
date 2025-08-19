@@ -162,7 +162,7 @@ This project is licensed under the MIT License.
 
 For support and questions:
 - Create an issue on GitHub
-- Contact: [your-email@example.com]
+- Contact: [chauhanparth6100@gmail.com]
 
 ---
 
