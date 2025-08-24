@@ -1,51 +1,52 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { useAuth } from "@/lib/auth-context"
-import { UserNav } from "@/components/user-nav"
-import { ModeToggle } from "@/components/mode-toggle"
-import { SideNav } from "@/components/side-nav"
-import { Loader2, Menu } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import { UserNav } from "@/components/user-nav";
+import { ModeToggle } from "@/components/mode-toggle";
+import { SideNav } from "@/components/side-nav";
+import { Loader2, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface DashboardShellProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function DashboardShell({ children }: DashboardShellProps) {
-  const { isAuthenticated, loading } = useAuth()
-  const router = useRouter()
-  const pathname = usePathname()
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      console.log("Not authenticated, redirecting to login")
-      router.push("/login")
+      router.push("/login");
     }
-  }, [isAuthenticated, loading, router])
+  }, [isAuthenticated, loading, router]);
 
   // Close mobile sidebar when route changes
   useEffect(() => {
-    setIsMobileSidebarOpen(false)
-  }, [pathname])
+    setIsMobileSidebarOpen(false);
+  }, [pathname]);
 
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground animate-pulse">Loading your dashboard...</p>
+          <p className="text-sm text-muted-foreground animate-pulse">
+            Loading your dashboard...
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!isAuthenticated) {
-    return null
+    return null;
   }
 
   return (
@@ -84,11 +85,9 @@ export function DashboardShell({ children }: DashboardShellProps) {
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,#000_60%,transparent_100%)] dark:bg-[radial-gradient(#1f2937_1px,transparent_1px)] opacity-70" />
 
           {/* Content with animation */}
-          <div className="animate-fade-in">
-            {children}
-          </div>
+          <div className="animate-fade-in">{children}</div>
         </main>
       </div>
     </div>
-  )
+  );
 }

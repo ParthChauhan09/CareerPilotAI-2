@@ -100,6 +100,12 @@ UserSchema.methods.canUseExportFormat = function (format) {
   return plan.features[featureKey] === true;
 };
 
+// Check if user's plan allows PDF preview (should be available for all plans)
+UserSchema.methods.canUsePdfPreview = function () {
+  const plan = config.plans[this.planType];
+  return plan.features.pdfPreview === true;
+};
+
 // Increment usage counter
 UserSchema.methods.incrementUsage = function (generationType) {
   this.usageStats[`${generationType}Generations`] += 1;

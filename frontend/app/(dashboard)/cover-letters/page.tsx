@@ -1,31 +1,43 @@
-"use client"
+"use client";
 
 // Force dynamic rendering to avoid SSG issues with React 19
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react"
-import { useAuth } from "@/lib/auth-context"
-import { DashboardShell } from "@/components/dashboard-shell"
-import { DashboardHeader } from "@/components/dashboard-header"
-import { DocumentList } from "@/components/document-list"
-import { Button } from "@/components/ui/button"
-import { PlusCircle, Loader2, FileEdit, RefreshCw } from "lucide-react"
-import { CreateDocumentDialog } from "@/components/create-document-dialog"
-import { coverLetterAPI } from "@/lib/api"
-import { useToast } from "@/hooks/use-toast"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import type { CoverLetter } from "@/lib/types"
-import { Input } from "@/components/ui/input"
+import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { DocumentList } from "@/components/document-list";
+import { Button } from "@/components/ui/button";
+import { PlusCircle, Loader2, FileEdit, RefreshCw } from "lucide-react";
+import { CreateDocumentDialog } from "@/components/create-document-dialog";
+import { coverLetterAPI } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import type { CoverLetter } from "@/lib/types";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
-} from "@/components/ui/select"
+  SelectValue,
+} from "@/components/ui/select";
 
 // Cover Letter Stats Component
-function CoverLetterStats({ count, isLoading }: { count: number, isLoading: boolean }) {
+function CoverLetterStats({
+  count,
+  isLoading,
+}: {
+  count: number;
+  isLoading: boolean;
+}) {
   return (
     <Card className="overflow-hidden border-muted-foreground/20">
       <CardHeader className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/30 pb-2">
@@ -43,114 +55,125 @@ function CoverLetterStats({ count, isLoading }: { count: number, isLoading: bool
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function CoverLettersPage() {
-  const { isAuthenticated, loading: authLoading } = useAuth()
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([])
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest" | "a-z" | "z-a">("newest")
-  const { toast } = useToast()
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<
+    "newest" | "oldest" | "a-z" | "z-a"
+  >("newest");
+  const { toast } = useToast();
 
   // Initial data fetch
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      fetchCoverLetters()
+      fetchCoverLetters();
     }
-  }, [authLoading, isAuthenticated])
+  }, [authLoading, isAuthenticated]);
 
   const fetchCoverLetters = async () => {
-    setLoading(true)
-    setRefreshing(true)
+    setLoading(true);
+    setRefreshing(true);
     try {
-      const response = await coverLetterAPI.getAllCoverLetters()
-      console.log("Cover letter API response:", response)
+      const response = await coverLetterAPI.getAllCoverLetters();
 
       // Try to get data from different possible locations in the response
-      let coverLetterData = []
-      if (response.data.coverLetters && Array.isArray(response.data.coverLetters)) {
-        console.log("Using coverLetters array from response")
-        coverLetterData = response.data.coverLetters
+      let coverLetterData = [];
+      if (
+        response.data.coverLetters &&
+        Array.isArray(response.data.coverLetters)
+      ) {
+        coverLetterData = response.data.coverLetters;
       } else if (response.data.data && Array.isArray(response.data.data)) {
-        console.log("Using data array from response")
-        coverLetterData = response.data.data
+        coverLetterData = response.data.data;
       } else if (Array.isArray(response.data)) {
-        console.log("Response.data is directly an array")
-        coverLetterData = response.data
-      } else {
-        console.warn("Could not find cover letter data in response:", response)
+        coverLetterData = response.data;
       }
-
-      console.log("Cover letter data to be set:", coverLetterData)
-      setCoverLetters(coverLetterData)
+      setCoverLetters(coverLetterData);
     } catch (error) {
-      console.error("Error fetching cover letters:", error)
       toast({
         title: "Error fetching cover letters",
         description: "Please try again later",
         variant: "destructive",
-      })
+      });
     } finally {
-      setLoading(false)
-      setRefreshing(false)
+      setLoading(false);
+      setRefreshing(false);
     }
-  }
+  };
 
   const handleCreateCoverLetter = () => {
-    setIsCreateDialogOpen(true)
-  }
+    setIsCreateDialogOpen(true);
+  };
 
   const handleCoverLetterCreated = () => {
-    fetchCoverLetters()
-    setIsCreateDialogOpen(false)
+    fetchCoverLetters();
+    setIsCreateDialogOpen(false);
 
     toast({
       title: "Cover letter created",
       description: "Your cover letter has been created successfully",
-      key: "cover-letter-created-" + new Date().getTime() // Add unique key to prevent duplicates
-    })
-  }
+      key: "cover-letter-created-" + new Date().getTime(), // Add unique key to prevent duplicates
+    });
+  };
 
   const handleDeleteCoverLetter = async (id: string) => {
     try {
-      await coverLetterAPI.deleteCoverLetter(id)
-      setCoverLetters(coverLetters.filter((letter) => letter.id !== id))
+      await coverLetterAPI.deleteCoverLetter(id);
+      setCoverLetters(coverLetters.filter((letter) => letter.id !== id));
 
       toast({
         title: "Cover letter deleted",
         description: "Your cover letter has been deleted successfully",
-      })
+      });
     } catch (error) {
       toast({
         title: "Error deleting cover letter",
         description: "Please try again later",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   // Filter and sort cover letters
-  const filteredCoverLetters = coverLetters.filter(letter =>
-    letter.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    ((letter as any).jobTitle && (letter as any).jobTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    ((letter as any).company && (letter as any).company.toLowerCase().includes(searchQuery.toLowerCase()))
-  )
+  const filteredCoverLetters = coverLetters.filter(
+    (letter) =>
+      letter.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ((letter as any).jobTitle &&
+        (letter as any).jobTitle
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())) ||
+      ((letter as any).company &&
+        (letter as any).company
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()))
+  );
 
   const sortedCoverLetters = [...filteredCoverLetters].sort((a, b) => {
     try {
       switch (sortOrder) {
         case "newest":
           // Safely parse dates with fallback
-          const dateA1 = a.updatedAt ? new Date(a.updatedAt).getTime() : new Date(a.createdAt).getTime();
-          const dateB1 = b.updatedAt ? new Date(b.updatedAt).getTime() : new Date(b.createdAt).getTime();
+          const dateA1 = a.updatedAt
+            ? new Date(a.updatedAt).getTime()
+            : new Date(a.createdAt).getTime();
+          const dateB1 = b.updatedAt
+            ? new Date(b.updatedAt).getTime()
+            : new Date(b.createdAt).getTime();
           return dateB1 - dateA1; // Newest first
         case "oldest":
-          const dateA2 = a.updatedAt ? new Date(a.updatedAt).getTime() : new Date(a.createdAt).getTime();
-          const dateB2 = b.updatedAt ? new Date(b.updatedAt).getTime() : new Date(b.createdAt).getTime();
+          const dateA2 = a.updatedAt
+            ? new Date(a.updatedAt).getTime()
+            : new Date(a.createdAt).getTime();
+          const dateB2 = b.updatedAt
+            ? new Date(b.updatedAt).getTime()
+            : new Date(b.createdAt).getTime();
           return dateA2 - dateB2; // Oldest first
         case "a-z":
           return (a.title || "").localeCompare(b.title || "");
@@ -160,20 +183,21 @@ export default function CoverLettersPage() {
           return 0;
       }
     } catch (error) {
-      console.error("Error sorting cover letters:", error);
       return 0; // Keep original order if there's an error
     }
-  })
+  });
 
   if (authLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground animate-pulse">Loading your cover letters...</p>
+          <p className="text-sm text-muted-foreground animate-pulse">
+            Loading your cover letters...
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -190,7 +214,9 @@ export default function CoverLettersPage() {
             disabled={refreshing}
             className="h-9 w-9"
           >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+            />
             <span className="sr-only">Refresh</span>
           </Button>
           <Button onClick={handleCreateCoverLetter} className="gap-1">
@@ -221,7 +247,6 @@ export default function CoverLettersPage() {
           <Select
             value={sortOrder}
             onValueChange={(value) => {
-              console.log("Changing sort order to:", value);
               setSortOrder(value as any);
             }}
           >
@@ -262,5 +287,5 @@ export default function CoverLettersPage() {
         />
       </div>
     </DashboardShell>
-  )
+  );
 }

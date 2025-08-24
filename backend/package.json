@@ -20,9 +20,11 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
+    "form-data": "^4.0.4",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.2",
     "openai": "^4.98.0",
+    "pdf2docx": "^0.0.0",
     "puppeteer": "^24.16.2",
     "razorpay": "^2.9.6",
     "sanitize-html": "^2.17.0"

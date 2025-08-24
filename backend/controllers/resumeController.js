@@ -1,9 +1,9 @@
 const Resume = require("../models/Resume");
-const geminiService = require("../utils/geminiService");
+const geminiServiceLatex = require("../utils/geminiServiceLatex");
 const responseFormatter = require("../utils/responseFormatter");
 
 /**
- * @desc    Generate a new resume
+ * @desc    Generate a new resume with LaTeX output
  * @route   POST /api/generate/resume
  * @access  Private
  */
@@ -12,12 +12,38 @@ exports.generateResume = async (req, res, next) => {
     const { title, promptData } = req.body;
 
     console.log(
-      "Generating resume with data:",
+      "Generating resume with LaTeX service:",
       JSON.stringify({ title, promptData }, null, 2)
     );
 
-    // Generate resume content using Gemini
-    const resultText = await geminiService.generateResume(promptData);
+    // Validate required fields
+    if (!title || !promptData) {
+      return responseFormatter.error(res, "Title and prompt data are required", 400);
+    }
+
+    // Generate resume LaTeX content using enhanced Gemini service with user data
+    let resultText;
+    try {
+      resultText = await geminiServiceLatex.generateResume(promptData, req.user);
+      console.log("LaTeX generation successful, content length:", resultText.length);
+    } catch (geminiError) {
+      console.error("LaTeX generation failed:", geminiError);
+      return responseFormatter.error(
+        res, 
+        `Resume generation failed: ${geminiError.message}`, 
+        500
+      );
+    }
+
+    // Validate that we got valid LaTeX content
+    if (!resultText || !resultText.includes('\\documentclass')) {
+      console.error("Invalid LaTeX content generated");
+      return responseFormatter.error(
+        res, 
+        "Failed to generate valid LaTeX content", 
+        500
+      );
+    }
 
     // Create resume in database
     const resume = await Resume.create({
@@ -37,13 +63,10 @@ exports.generateResume = async (req, res, next) => {
       promptData: resume.promptData,
       resultText: resume.resultText,
       createdAt: resume.createdAt,
-      updatedAt: resume.createdAt, // MongoDB doesn't have updatedAt by default, so use createdAt
+      updatedAt: resume.createdAt,
     };
 
-    console.log(
-      "Resume generated successfully:",
-      JSON.stringify(transformedResume, null, 2)
-    );
+    console.log("Resume generated successfully with LaTeX content");
 
     responseFormatter.success(
       res,
@@ -85,14 +108,11 @@ exports.getResumes = async (req, res, next) => {
         promptData: resume.promptData,
         resultText: resume.resultText,
         createdAt: resume.createdAt,
-        updatedAt: resume.createdAt, // MongoDB doesn't have updatedAt by default, so use createdAt
+        updatedAt: resume.createdAt,
       };
     });
 
-    console.log(
-      "Sending resumes to frontend:",
-      JSON.stringify(transformedResumes, null, 2)
-    );
+    console.log(`Retrieved ${transformedResumes.length} resumes for user`);
 
     responseFormatter.pagination(
       res,
@@ -137,13 +157,10 @@ exports.getResume = async (req, res, next) => {
       promptData: resume.promptData,
       resultText: resume.resultText,
       createdAt: resume.createdAt,
-      updatedAt: resume.createdAt, // MongoDB doesn't have updatedAt by default, so use createdAt
+      updatedAt: resume.createdAt,
     };
 
-    console.log(
-      "Sending single resume to frontend:",
-      JSON.stringify(transformedResume, null, 2)
-    );
+    console.log("Retrieved single resume:", resume._id);
 
     responseFormatter.success(res, "Resume retrieved successfully", {
       resume: transformedResume,

@@ -1,9 +1,9 @@
 const LinkedInBio = require("../models/LinkedInBio");
-const geminiService = require("../utils/geminiService");
+const geminiServiceLatex = require("../utils/geminiServiceLatex");
 const responseFormatter = require("../utils/responseFormatter");
 
 /**
- * @desc    Generate a new LinkedIn bio
+ * @desc    Generate a new LinkedIn bio with LaTeX output
  * @route   POST /api/generate/linkedin
  * @access  Private
  */
@@ -11,26 +11,73 @@ exports.generateLinkedInBio = async (req, res, next) => {
   try {
     const { title, profile, experience, preferences } = req.body;
 
-    // Generate LinkedIn bio content using Gemini
-    const generatedContent = await geminiService.generateLinkedInBio({
+    console.log(
+      "Generating LinkedIn bio with LaTeX service:",
+      JSON.stringify({ title, profile, experience, preferences }, null, 2)
+    );
+
+    // Validate required fields
+    if (!title) {
+      return responseFormatter.error(res, "Title is required", 400);
+    }
+
+    if (!profile || !profile.firstName || !profile.lastName || !profile.currentPosition || !profile.industry) {
+      return responseFormatter.error(res, "Profile information (firstName, lastName, currentPosition, industry) is required", 400);
+    }
+
+    if (!experience || !experience.professionalExperience) {
+      return responseFormatter.error(res, "Professional experience is required", 400);
+    }
+
+    if (!preferences || !preferences.targetRole) {
+      return responseFormatter.error(res, "Target role preference is required", 400);
+    }
+
+    // Structure the data properly for the Gemini service
+    const structuredData = {
       profile,
       experience,
-      preferences,
-    });
+      preferences
+    };
 
-    // Create LinkedIn bio in database
+    // Generate LinkedIn bio LaTeX content using enhanced Gemini service with user data
+    let resultText;
+    try {
+      resultText = await geminiServiceLatex.generateLinkedInBio(structuredData, req.user);
+      console.log("LaTeX generation successful, content length:", resultText.length);
+    } catch (geminiError) {
+      console.error("LaTeX generation failed:", geminiError);
+      return responseFormatter.error(
+        res, 
+        `LinkedIn bio generation failed: ${geminiError.message}`, 
+        500
+      );
+    }
+
+    // Validate that we got valid LaTeX content
+    if (!resultText || !resultText.includes('\\documentclass')) {
+      console.error("Invalid LaTeX content generated");
+      return responseFormatter.error(
+        res, 
+        "Failed to generate valid LaTeX content", 
+        500
+      );
+    }
+
+    // Create LinkedIn bio in database with proper structure
     const linkedinBio = await LinkedInBio.create({
       user: req.user.id,
       title,
       profile,
       experience,
       preferences,
-      content: generatedContent,
-      updatedAt: Date.now(),
+      resultText,
     });
 
     // Increment user's usage counter
-    await req.user.incrementUsage("linkedin");
+    await req.user.incrementUsage("linkedinBio");
+
+    console.log("LinkedIn bio generated successfully with LaTeX content");
 
     responseFormatter.success(
       res,
@@ -39,6 +86,7 @@ exports.generateLinkedInBio = async (req, res, next) => {
       201
     );
   } catch (err) {
+    console.error("Error generating LinkedIn bio:", err);
     next(err);
   }
 };
@@ -63,6 +111,8 @@ exports.getLinkedInBios = async (req, res, next) => {
       .skip(startIndex)
       .limit(limit);
 
+    console.log(`Retrieved ${linkedinBios.length} LinkedIn bios for user`);
+
     responseFormatter.pagination(
       res,
       linkedinBios,
@@ -72,6 +122,7 @@ exports.getLinkedInBios = async (req, res, next) => {
       "LinkedIn bios retrieved successfully"
     );
   } catch (err) {
+    console.error("Error fetching LinkedIn bios:", err);
     next(err);
   }
 };
@@ -98,10 +149,13 @@ exports.getLinkedInBio = async (req, res, next) => {
       );
     }
 
+    console.log("Retrieved single LinkedIn bio:", linkedinBio._id);
+
     responseFormatter.success(res, "LinkedIn bio retrieved successfully", {
       linkedinBio,
     });
   } catch (err) {
+    console.error("Error fetching single LinkedIn bio:", err);
     next(err);
   }
 };
@@ -128,22 +182,12 @@ exports.updateLinkedInBio = async (req, res, next) => {
       );
     }
 
-    // Update allowed fields
-    const { title, profile, experience, preferences, content } = req.body;
-
-    const updateData = {
-      updatedAt: Date.now(),
-    };
-
-    if (title) updateData.title = title;
-    if (profile) updateData.profile = profile;
-    if (experience) updateData.experience = experience;
-    if (preferences) updateData.preferences = preferences;
-    if (content) updateData.content = content;
+    // Update only allowed fields
+    const { title } = req.body;
 
     linkedinBio = await LinkedInBio.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      { title },
       { new: true, runValidators: true }
     );
 

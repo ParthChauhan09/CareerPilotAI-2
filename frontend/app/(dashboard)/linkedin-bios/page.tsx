@@ -1,31 +1,48 @@
-"use client"
+"use client";
 
 // Force dynamic rendering to avoid SSG issues with React 19
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react"
-import { useAuth } from "@/lib/auth-context"
-import { DashboardShell } from "@/components/dashboard-shell"
-import { DashboardHeader } from "@/components/dashboard-header"
-import { DocumentList } from "@/components/document-list"
-import { Button } from "@/components/ui/button"
-import { PlusCircle, Loader2, RefreshCw, FileText as LinkedinIcon } from "lucide-react"
-import { CreateDocumentDialog } from "@/components/create-document-dialog"
-import { linkedinAPI } from "@/lib/api"
-import { useToast } from "@/hooks/use-toast"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import type { LinkedInBio } from "@/lib/types"
-import { Input } from "@/components/ui/input"
+import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { DocumentList } from "@/components/document-list";
+import { Button } from "@/components/ui/button";
+import {
+  PlusCircle,
+  Loader2,
+  RefreshCw,
+  FileText as LinkedinIcon,
+} from "lucide-react";
+import { CreateDocumentDialog } from "@/components/create-document-dialog";
+import { linkedinAPI } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import type { LinkedInBio } from "@/lib/types";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
-} from "@/components/ui/select"
+  SelectValue,
+} from "@/components/ui/select";
 
 // LinkedIn Bio Stats Component
-function LinkedInBioStats({ count, isLoading }: { count: number, isLoading: boolean }) {
+function LinkedInBioStats({
+  count,
+  isLoading,
+}: {
+  count: number;
+  isLoading: boolean;
+}) {
   return (
     <Card className="overflow-hidden border-muted-foreground/20">
       <CardHeader className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950/50 dark:to-indigo-900/30 pb-2">
@@ -43,97 +60,112 @@ function LinkedInBioStats({ count, isLoading }: { count: number, isLoading: bool
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function LinkedInBiosPage() {
-  const { isAuthenticated, loading: authLoading } = useAuth()
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [linkedinBios, setLinkedinBios] = useState<LinkedInBio[]>([])
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest" | "a-z" | "z-a">("newest")
-  const { toast } = useToast()
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [linkedinBios, setLinkedinBios] = useState<LinkedInBio[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<
+    "newest" | "oldest" | "a-z" | "z-a"
+  >("newest");
+  const { toast } = useToast();
 
   // Initial data fetch
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      fetchLinkedInBios()
+      fetchLinkedInBios();
     }
-  }, [authLoading, isAuthenticated])
+  }, [authLoading, isAuthenticated]);
 
   const fetchLinkedInBios = async () => {
-    setLoading(true)
-    setRefreshing(true)
+    setLoading(true);
+    setRefreshing(true);
     try {
-      const response = await linkedinAPI.getAllLinkedInBios()
-      const linkedinData = response.data.linkedinBios || response.data.data || []
-      setLinkedinBios(linkedinData)
+      const response = await linkedinAPI.getAllLinkedInBios();
+      const linkedinData =
+        response.data.linkedinBios || response.data.data || [];
+      setLinkedinBios(linkedinData);
     } catch (error) {
-      console.error("Error fetching LinkedIn bios:", error)
       toast({
         title: "Error fetching LinkedIn bios",
         description: "Please try again later",
         variant: "destructive",
-      })
+      });
     } finally {
-      setLoading(false)
-      setRefreshing(false)
+      setLoading(false);
+      setRefreshing(false);
     }
-  }
+  };
 
   const handleCreateLinkedInBio = () => {
-    setIsCreateDialogOpen(true)
-  }
+    setIsCreateDialogOpen(true);
+  };
 
   const handleLinkedInBioCreated = () => {
-    fetchLinkedInBios()
-    setIsCreateDialogOpen(false)
+    fetchLinkedInBios();
+    setIsCreateDialogOpen(false);
 
     toast({
       title: "LinkedIn bio created",
       description: "Your LinkedIn bio has been created successfully",
-      key: "linkedin-bio-created-" + new Date().getTime() // Add unique key to prevent duplicates
-    })
-  }
+      key: "linkedin-bio-created-" + new Date().getTime(), // Add unique key to prevent duplicates
+    });
+  };
 
   const handleDeleteLinkedInBio = async (id: string) => {
     try {
-      await linkedinAPI.deleteLinkedInBio(id)
-      setLinkedinBios(linkedinBios.filter((bio) => bio.id !== id))
+      await linkedinAPI.deleteLinkedInBio(id);
+      setLinkedinBios(linkedinBios.filter((bio) => bio.id !== id));
 
       toast({
         title: "LinkedIn bio deleted",
         description: "Your LinkedIn bio has been deleted successfully",
-      })
+      });
     } catch (error) {
       toast({
         title: "Error deleting LinkedIn bio",
         description: "Please try again later",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   // Filter and sort LinkedIn bios
-  const filteredLinkedInBios = linkedinBios.filter(bio =>
-    bio.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    ((bio as any).headline && (bio as any).headline.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    ((bio as any).industry && (bio as any).industry.toLowerCase().includes(searchQuery.toLowerCase()))
-  )
+  const filteredLinkedInBios = linkedinBios.filter(
+    (bio) =>
+      bio.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ((bio as any).headline &&
+        (bio as any).headline
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())) ||
+      ((bio as any).industry &&
+        (bio as any).industry.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   const sortedLinkedInBios = [...filteredLinkedInBios].sort((a, b) => {
     try {
       switch (sortOrder) {
         case "newest":
           // Safely parse dates with fallback
-          const dateA1 = a.updatedAt ? new Date(a.updatedAt).getTime() : new Date(a.createdAt).getTime();
-          const dateB1 = b.updatedAt ? new Date(b.updatedAt).getTime() : new Date(b.createdAt).getTime();
+          const dateA1 = a.updatedAt
+            ? new Date(a.updatedAt).getTime()
+            : new Date(a.createdAt).getTime();
+          const dateB1 = b.updatedAt
+            ? new Date(b.updatedAt).getTime()
+            : new Date(b.createdAt).getTime();
           return dateB1 - dateA1; // Newest first
         case "oldest":
-          const dateA2 = a.updatedAt ? new Date(a.updatedAt).getTime() : new Date(a.createdAt).getTime();
-          const dateB2 = b.updatedAt ? new Date(b.updatedAt).getTime() : new Date(b.createdAt).getTime();
+          const dateA2 = a.updatedAt
+            ? new Date(a.updatedAt).getTime()
+            : new Date(a.createdAt).getTime();
+          const dateB2 = b.updatedAt
+            ? new Date(b.updatedAt).getTime()
+            : new Date(b.createdAt).getTime();
           return dateA2 - dateB2; // Oldest first
         case "a-z":
           return (a.title || "").localeCompare(b.title || "");
@@ -143,20 +175,21 @@ export default function LinkedInBiosPage() {
           return 0;
       }
     } catch (error) {
-      console.error("Error sorting LinkedIn bios:", error);
       return 0; // Keep original order if there's an error
     }
-  })
+  });
 
   if (authLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground animate-pulse">Loading your LinkedIn bios...</p>
+          <p className="text-sm text-muted-foreground animate-pulse">
+            Loading your LinkedIn bios...
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -173,7 +206,9 @@ export default function LinkedInBiosPage() {
             disabled={refreshing}
             className="h-9 w-9"
           >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+            />
             <span className="sr-only">Refresh</span>
           </Button>
           <Button onClick={handleCreateLinkedInBio} className="gap-1">
@@ -204,7 +239,6 @@ export default function LinkedInBiosPage() {
           <Select
             value={sortOrder}
             onValueChange={(value) => {
-              console.log("Changing sort order to:", value);
               setSortOrder(value as any);
             }}
           >
@@ -245,5 +279,5 @@ export default function LinkedInBiosPage() {
         />
       </div>
     </DashboardShell>
-  )
+  );
 }

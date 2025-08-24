@@ -1,15 +1,42 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Download, FileText, MoreHorizontal, Pencil, PlusCircle, Trash2, RefreshCw } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Download,
+  FileText,
+  MoreHorizontal,
+  Pencil,
+  PlusCircle,
+  Trash2,
+  RefreshCw,
+} from "lucide-react";
+import { ExportDropdown } from "@/components/export-dropdown";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,19 +46,19 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import type { DocumentType } from "@/lib/types"
+} from "@/components/ui/alert-dialog";
+import type { DocumentType } from "@/lib/types";
 
 interface DocumentListProps {
-  type: DocumentType
-  documents: any[]
-  loading: boolean
-  onCreateNew: () => void
-  onDelete: (id: string) => void
-  onRefresh: () => void
-  hideSearch?: boolean
-  hideSort?: boolean
-  externalSearchQuery?: string
+  type: DocumentType;
+  documents: any[];
+  loading: boolean;
+  onCreateNew: () => void;
+  onDelete: (id: string) => void;
+  onRefresh: () => void;
+  hideSearch?: boolean;
+  hideSort?: boolean;
+  externalSearchQuery?: string;
 }
 
 export function DocumentList({
@@ -43,141 +70,132 @@ export function DocumentList({
   onRefresh,
   hideSearch = false,
   hideSort = false,
-  externalSearchQuery = ""
+  externalSearchQuery = "",
 }: DocumentListProps) {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [sortBy, setSortBy] = useState("updatedAt")
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [documentToDelete, setDocumentToDelete] = useState<string | null>(null)
-
-  // Debug the documents being passed to the component
-  console.log(`DocumentList (${type}) received documents:`, documents)
-
-  // Debug sorting information
-  useEffect(() => {
-    if (documents.length > 0) {
-      console.log(`DocumentList (${type}) sorting info:`, {
-        hideSort,
-        hideSearch,
-        externalSearchQuery,
-        internalSortBy: sortBy,
-        documentCount: documents.length,
-        firstDocumentSample: documents[0],
-        hasUpdatedAt: documents[0]?.updatedAt ? true : false,
-        hasCreatedAt: documents[0]?.createdAt ? true : false
-      });
-    }
-  }, [documents, hideSort, sortBy, type, externalSearchQuery, hideSearch]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("updatedAt");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
 
   // Use external search query if provided
-  const effectiveSearchQuery = externalSearchQuery || searchQuery
+  const effectiveSearchQuery = externalSearchQuery || searchQuery;
 
   const getDocumentIcon = (forCard = false) => {
-    const baseClass = forCard
-      ? "h-10 w-10"
-      : "h-8 w-8"
+    const baseClass = forCard ? "h-10 w-10" : "h-8 w-8";
 
     // Add a subtle animation to the icon
-    const animationClass = forCard ? "group-hover:scale-110 transition-transform duration-300" : ""
+    const animationClass = forCard
+      ? "group-hover:scale-110 transition-transform duration-300"
+      : "";
 
     switch (type) {
       case "resume":
         return (
-          <div className={`relative flex items-center justify-center rounded-full bg-blue-100 p-2 dark:bg-blue-900/30 ${forCard ? "h-12 w-12" : "h-10 w-10"} ${animationClass}`}>
-            <FileText className={`${baseClass} text-blue-600 dark:text-blue-400`} />
+          <div
+            className={`relative flex items-center justify-center rounded-full bg-blue-100 p-2 dark:bg-blue-900/30 ${
+              forCard ? "h-12 w-12" : "h-10 w-10"
+            } ${animationClass}`}
+          >
+            <FileText
+              className={`${baseClass} text-blue-600 dark:text-blue-400`}
+            />
           </div>
-        )
+        );
       case "coverLetter":
         return (
-          <div className={`relative flex items-center justify-center rounded-full bg-purple-100 p-2 dark:bg-purple-900/30 ${forCard ? "h-12 w-12" : "h-10 w-10"} ${animationClass}`}>
-            <FileText className={`${baseClass} text-purple-600 dark:text-purple-400`} />
+          <div
+            className={`relative flex items-center justify-center rounded-full bg-purple-100 p-2 dark:bg-purple-900/30 ${
+              forCard ? "h-12 w-12" : "h-10 w-10"
+            } ${animationClass}`}
+          >
+            <FileText
+              className={`${baseClass} text-purple-600 dark:text-purple-400`}
+            />
           </div>
-        )
+        );
       case "linkedin":
         return (
-          <div className={`relative flex items-center justify-center rounded-full bg-indigo-100 p-2 dark:bg-indigo-900/30 ${forCard ? "h-12 w-12" : "h-10 w-10"} ${animationClass}`}>
-            <FileText className={`${baseClass} text-indigo-600 dark:text-indigo-400`} />
+          <div
+            className={`relative flex items-center justify-center rounded-full bg-indigo-100 p-2 dark:bg-indigo-900/30 ${
+              forCard ? "h-12 w-12" : "h-10 w-10"
+            } ${animationClass}`}
+          >
+            <FileText
+              className={`${baseClass} text-indigo-600 dark:text-indigo-400`}
+            />
           </div>
-        )
+        );
       default:
         return (
-          <div className={`relative flex items-center justify-center rounded-full bg-primary/10 p-2 ${forCard ? "h-12 w-12" : "h-10 w-10"} ${animationClass}`}>
+          <div
+            className={`relative flex items-center justify-center rounded-full bg-primary/10 p-2 ${
+              forCard ? "h-12 w-12" : "h-10 w-10"
+            } ${animationClass}`}
+          >
             <FileText className={`${baseClass} text-primary`} />
           </div>
-        )
+        );
     }
-  }
+  };
 
   const getDocumentTypeName = () => {
     switch (type) {
       case "resume":
-        return "Resume"
+        return "Resume";
       case "coverLetter":
-        return "Cover Letter"
+        return "Cover Letter";
       case "linkedin":
-        return "LinkedIn Bio"
+        return "LinkedIn Bio";
       default:
-        return "Document"
+        return "Document";
     }
-  }
+  };
 
   const getDocumentTypeUrl = () => {
     switch (type) {
       case "resume":
-        return "resume"
+        return "resume";
       case "coverLetter":
-        return "cover-letter"
+        return "cover-letter";
       case "linkedin":
-        return "linkedin"
+        return "linkedin";
       default:
-        return "document"
+        return "document";
     }
-  }
-
-
+  };
 
   const getDocumentContent = (doc: any): string => {
     // Handle different document structures
-    console.log(`getDocumentContent for document type ${type}:`, doc);
-
-    // Check for direct content as string
-    if (typeof doc.content === 'string') {
-      console.log("Found direct content string");
+    if (doc?.content) {
       return doc.content;
     }
 
     // Check for resultText
-    if (typeof doc.resultText === 'string') {
-      console.log("Found direct resultText string");
+    if (typeof doc.resultText === "string") {
       return doc.resultText;
     }
 
     // Check for nested coverLetter structure
-    if (doc.coverLetter && typeof doc.coverLetter.resultText === 'string') {
-      console.log("Found nested coverLetter.resultText string");
+    if (doc.coverLetter && typeof doc.coverLetter.resultText === "string") {
       return doc.coverLetter.resultText;
     }
 
     // Check for nested content as string
-    if (doc.coverLetter && typeof doc.coverLetter.content === 'string') {
-      console.log("Found nested coverLetter.content string");
+    if (doc.coverLetter && typeof doc.coverLetter.content === "string") {
       return doc.coverLetter.content;
     }
 
     // Check for promptData.jobDescription (for cover letters)
-    if (doc.promptData && typeof doc.promptData.jobDescription === 'string') {
-      console.log("Found promptData.jobDescription string");
+    if (doc.promptData && typeof doc.promptData.jobDescription === "string") {
       return doc.promptData.jobDescription;
     }
 
     // Special handling for LinkedIn bios
-    if (type === 'linkedin') {
-      console.log("LinkedIn bio detected, content structure:", doc);
-
+    if (type === "linkedin") {
       // Direct approach for the structure we've seen in the debug tab
-      if (doc.profile && doc.content && typeof doc.content === 'object') {
+      if (doc.profile && doc.content && typeof doc.content === "object") {
         // Format LinkedIn content into a readable string
-        let linkedInContent = '';
+        let linkedInContent = "";
 
         // Add name and headline if available
         if (doc.profile.firstName && doc.profile.lastName) {
@@ -187,29 +205,33 @@ export function DocumentList({
             linkedInContent += ` | ${doc.profile.currentPosition}`;
           }
 
-          linkedInContent += '\n\n';
+          linkedInContent += "\n\n";
         }
 
         // Add headline from content if available
-        if (doc.content.headline && typeof doc.content.headline === 'string') {
-          linkedInContent += doc.content.headline + '\n\n';
+        if (doc.content.headline && typeof doc.content.headline === "string") {
+          linkedInContent += doc.content.headline + "\n\n";
         }
 
         // Add about section if available
-        if (doc.content.about && typeof doc.content.about === 'string') {
-          linkedInContent += 'About: ' + doc.content.about + '\n\n';
+        if (doc.content.about && typeof doc.content.about === "string") {
+          linkedInContent += "About: " + doc.content.about + "\n\n";
         }
 
         // Add experience if available
-        if (doc.content.experience && typeof doc.content.experience === 'string') {
-          linkedInContent += 'Experience: ' + doc.content.experience + '\n\n';
+        if (
+          doc.content.experience &&
+          typeof doc.content.experience === "string"
+        ) {
+          linkedInContent += "Experience: " + doc.content.experience + "\n\n";
         } else if (doc.experience && doc.experience.professionalExperience) {
-          linkedInContent += 'Experience: ' + doc.experience.professionalExperience + '\n\n';
+          linkedInContent +=
+            "Experience: " + doc.experience.professionalExperience + "\n\n";
         }
 
         // Add skills if available
         if (doc.experience && doc.experience.skills) {
-          linkedInContent += 'Skills: ' + doc.experience.skills;
+          linkedInContent += "Skills: " + doc.experience.skills;
         }
 
         const trimmedContent = linkedInContent.trim();
@@ -221,7 +243,7 @@ export function DocumentList({
       // Fallback: If we have a profile object, create a summary from it
       if (doc.profile) {
         const profile = doc.profile;
-        let profileSummary = '';
+        let profileSummary = "";
 
         if (profile.firstName && profile.lastName) {
           profileSummary += `${profile.firstName} ${profile.lastName}`;
@@ -251,13 +273,13 @@ export function DocumentList({
       }
 
       // Last resort: stringify the content object if it exists
-      if (doc.content && typeof doc.content === 'object') {
+      if (doc.content && typeof doc.content === "object") {
         try {
           // Extract just the most important fields to avoid [object Object]
           const contentSummary = {
-            headline: doc.content.headline || '',
-            about: doc.content.about || '',
-            experience: doc.content.experience || ''
+            headline: doc.content.headline || "",
+            about: doc.content.about || "",
+            experience: doc.content.experience || "",
           };
 
           // Only include non-empty fields
@@ -271,14 +293,16 @@ export function DocumentList({
           // If we have any content, format it as a string
           if (Object.keys(filteredSummary).length > 0) {
             return Object.entries(filteredSummary)
-              .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`)
-              .join('\n\n');
+              .map(
+                ([key, value]) =>
+                  `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`
+              )
+              .join("\n\n");
           }
 
           // If all else fails, return a simple string representation
           return "LinkedIn Profile";
         } catch (e) {
-          console.error("Error processing LinkedIn content:", e);
           return "LinkedIn Profile";
         }
       }
@@ -286,70 +310,58 @@ export function DocumentList({
 
     // Return empty string as fallback
     return "";
-  }
+  };
 
   // Function to safely get document ID
   const getDocumentId = (doc: any): string => {
-    console.log("Getting document ID for:", doc);
-
-    // Check for direct ID
-    if (doc && doc.id) {
-      console.log("Found direct id:", doc.id);
+    // Try different properties that might contain the ID
+    if (doc?.id) {
       return doc.id;
     }
 
-    // Check for nested ID in coverLetter
-    if (doc && doc.coverLetter && doc.coverLetter.id) {
-      console.log("Found nested coverLetter.id:", doc.coverLetter.id);
+    if (doc?.coverLetter?.id) {
       return doc.coverLetter.id;
     }
 
-    // Check for _id format (MongoDB sometimes uses this)
-    if (doc && doc._id) {
-      console.log("Found direct _id:", doc._id);
+    if (doc?._id) {
       return doc._id;
     }
 
-    // Check for nested _id in coverLetter
-    if (doc && doc.coverLetter && doc.coverLetter._id) {
-      console.log("Found nested coverLetter._id:", doc.coverLetter._id);
+    if (doc?.coverLetter?._id) {
       return doc.coverLetter._id;
     }
 
-    // Check for string ID (sometimes MongoDB returns the ID as a string)
-    if (doc && typeof doc === 'object' && Object.prototype.toString.call(doc) === '[object String]') {
-      console.log("Document is a string ID:", doc);
+    // If doc is just an ID string
+    if (typeof doc === "string") {
       return doc;
     }
-
-    console.error("Could not find ID for document:", doc);
     return "unknown-id";
-  }
+  };
 
   // Function to safely get document title
   const getDocumentTitle = (doc: any): string => {
     // Check for direct title
-    if (doc && typeof doc.title === 'string') {
+    if (doc && typeof doc.title === "string") {
       return doc.title;
     }
 
     // Check for nested title in coverLetter
-    if (doc && doc.coverLetter && typeof doc.coverLetter.title === 'string') {
+    if (doc && doc.coverLetter && typeof doc.coverLetter.title === "string") {
       return doc.coverLetter.title;
     }
 
     // Check for name as fallback
-    if (doc && typeof doc.name === 'string') {
+    if (doc && typeof doc.name === "string") {
       return doc.name;
     }
 
     // Check for nested name in coverLetter
-    if (doc && doc.coverLetter && typeof doc.coverLetter.name === 'string') {
+    if (doc && doc.coverLetter && typeof doc.coverLetter.name === "string") {
       return doc.coverLetter.name;
     }
 
     return "Untitled Document";
-  }
+  };
 
   // Function to safely get document date
   const getDocumentDate = (doc: any): string => {
@@ -394,27 +406,19 @@ export function DocumentList({
       }
 
       // If we have a date string in any format, try to parse it
-      if (doc && typeof doc.date === 'string') {
+      if (doc && typeof doc.date === "string") {
         return new Date(doc.date).toISOString();
       }
 
       return defaultDate;
     } catch (error) {
-      console.error("Error getting document date:", error);
       return defaultDate;
     }
-  }
+  };
 
   const filteredDocuments = documents.filter((doc) => {
     const title = getDocumentTitle(doc).toLowerCase();
     return title.includes(effectiveSearchQuery.toLowerCase());
-  })
-
-  // Log the filtered documents before sorting
-  console.log(`DocumentList (${type}) filtered documents:`, {
-    count: filteredDocuments.length,
-    sample: filteredDocuments.length > 0 ? filteredDocuments[0] : null,
-    hideSort
   });
 
   // Only sort internally if we're not using external sorting (hideSort is false)
@@ -434,35 +438,22 @@ export function DocumentList({
             return getDocumentTitle(a).localeCompare(getDocumentTitle(b));
           }
         } catch (error) {
-          console.error("Error sorting documents:", error);
           return 0; // Keep original order if there's an error
         }
-      })
-
-  // Log the sorted documents after sorting
-  useEffect(() => {
-    if (sortedDocuments.length > 0) {
-      console.log(`DocumentList (${type}) sorted documents:`, {
-        count: sortedDocuments.length,
-        sample: sortedDocuments[0],
-        sortBy,
-        hideSort
       });
-    }
-  }, [sortedDocuments, type, sortBy, hideSort]);
 
   const handleDeleteClick = (id: string) => {
-    setDocumentToDelete(id)
-    setDeleteDialogOpen(true)
-  }
+    setDocumentToDelete(id);
+    setDeleteDialogOpen(true);
+  };
 
   const confirmDelete = () => {
     if (documentToDelete) {
-      onDelete(documentToDelete)
-      setDeleteDialogOpen(false)
-      setDocumentToDelete(null)
+      onDelete(documentToDelete);
+      setDeleteDialogOpen(false);
+      setDocumentToDelete(null);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -534,7 +525,10 @@ export function DocumentList({
       {loading ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="overflow-hidden border-muted-foreground/10 transition-all duration-200 hover:shadow-md">
+            <Card
+              key={i}
+              className="overflow-hidden border-muted-foreground/10 transition-all duration-200 hover:shadow-md"
+            >
               <CardHeader className="flex flex-row items-start gap-4 space-y-0 pb-2">
                 <Skeleton className="h-12 w-12 rounded-full" />
                 <div className="space-y-1 flex-1">
@@ -561,7 +555,9 @@ export function DocumentList({
               {getDocumentIcon(true)}
             </div>
           </div>
-          <h3 className="mt-4 text-xl font-semibold">No {getDocumentTypeName()}s Found</h3>
+          <h3 className="mt-4 text-xl font-semibold">
+            No {getDocumentTypeName()}s Found
+          </h3>
           <p className="mb-6 mt-2 text-sm text-muted-foreground max-w-md">
             {effectiveSearchQuery
               ? `No ${getDocumentTypeName().toLowerCase()}s match your search criteria.`
@@ -604,7 +600,7 @@ export function DocumentList({
               className="group overflow-hidden border-muted-foreground/10 transition-all duration-300 hover:shadow-lg hover:border-primary/20 animate-fade-in"
               style={{
                 animationDelay: `${index * 50}ms`,
-                animationFillMode: 'both'
+                animationFillMode: "both",
               }}
             >
               {/* Removed the full-card link that was causing issues */}
@@ -612,7 +608,9 @@ export function DocumentList({
               {/* Card header with icon and title */}
               <CardHeader className="flex flex-row items-start gap-4 space-y-0 pb-2 relative z-20">
                 <Link
-                  href={`/document/${getDocumentTypeUrl()}/${getDocumentId(doc)}`}
+                  href={`/document/${getDocumentTypeUrl()}/${getDocumentId(
+                    doc
+                  )}`}
                   className="cursor-pointer"
                 >
                   {getDocumentIcon(true)}
@@ -620,7 +618,9 @@ export function DocumentList({
                 <div className="space-y-1 flex-1">
                   <CardTitle className="line-clamp-1 group-hover:text-primary transition-colors">
                     <Link
-                      href={`/document/${getDocumentTypeUrl()}/${getDocumentId(doc)}`}
+                      href={`/document/${getDocumentTypeUrl()}/${getDocumentId(
+                        doc
+                      )}`}
                       className="hover:underline cursor-pointer"
                     >
                       {getDocumentTitle(doc)}
@@ -628,12 +628,18 @@ export function DocumentList({
                   </CardTitle>
                   <CardDescription className="flex items-center gap-1">
                     <span>Updated</span>
-                    <time dateTime={getDocumentDate(doc)} className="font-medium text-muted-foreground">
-                      {new Date(getDocumentDate(doc)).toLocaleDateString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
+                    <time
+                      dateTime={getDocumentDate(doc)}
+                      className="font-medium text-muted-foreground"
+                    >
+                      {new Date(getDocumentDate(doc)).toLocaleDateString(
+                        undefined,
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        }
+                      )}
                     </time>
                   </CardDescription>
                 </div>
@@ -653,13 +659,23 @@ export function DocumentList({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[180px]">
                       <DropdownMenuItem asChild>
-                        <Link href={`/document/${getDocumentTypeUrl()}/${getDocumentId(doc)}`} className="cursor-pointer">
+                        <Link
+                          href={`/document/${getDocumentTypeUrl()}/${getDocumentId(
+                            doc
+                          )}`}
+                          className="cursor-pointer"
+                        >
                           <Pencil className="mr-2 h-4 w-4" />
                           View & Edit
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href={`/document/${getDocumentTypeUrl()}/${getDocumentId(doc)}?tab=export`} className="cursor-pointer">
+                        <Link
+                          href={`/document/${getDocumentTypeUrl()}/${getDocumentId(
+                            doc
+                          )}?tab=export`}
+                          className="cursor-pointer"
+                        >
                           <Download className="mr-2 h-4 w-4" />
                           Export
                         </Link>
@@ -685,12 +701,18 @@ export function DocumentList({
                 <div className="text-sm text-muted-foreground flex flex-col gap-1">
                   <div className="flex items-center gap-1">
                     <span>Created</span>
-                    <time dateTime={getDocumentDate(doc)} className="font-medium">
-                      {new Date(getDocumentDate(doc)).toLocaleDateString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
+                    <time
+                      dateTime={getDocumentDate(doc)}
+                      className="font-medium"
+                    >
+                      {new Date(getDocumentDate(doc)).toLocaleDateString(
+                        undefined,
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        }
+                      )}
                     </time>
                   </div>
 
@@ -699,13 +721,16 @@ export function DocumentList({
                     const content = getDocumentContent(doc);
                     return content ? (
                       <Link
-                        href={`/document/${getDocumentTypeUrl()}/${getDocumentId(doc)}`}
+                        href={`/document/${getDocumentTypeUrl()}/${getDocumentId(
+                          doc
+                        )}`}
                         className="block mt-2 hover:bg-muted/50 transition-colors rounded"
                       >
                         <div className="line-clamp-2 text-xs p-2 rounded bg-muted/30 border border-muted/50 italic">
                           {content.length > 150
-                            ? content.substring(0, 150).replace(/\n/g, ' ') + '...'
-                            : content.replace(/\n/g, ' ')}
+                            ? content.substring(0, 150).replace(/\n/g, " ") +
+                              "..."
+                            : content.replace(/\n/g, " ")}
                         </div>
                       </Link>
                     ) : null;
@@ -713,32 +738,57 @@ export function DocumentList({
                 </div>
               </CardContent>
 
-              {/* Card footer with badge and action button */}
+              {/* Card footer with badge and action buttons */}
               <CardFooter className="border-t p-4 flex justify-between items-center bg-muted/5 relative z-20">
                 <Badge
                   variant="outline"
                   className={`
-                    ${type === 'resume' ? 'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800' : ''}
-                    ${type === 'coverLetter' ? 'border-purple-200 bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800' : ''}
-                    ${type === 'linkedin' ? 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800' : ''}
+                    ${
+                      type === "resume"
+                        ? "border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
+                        : ""
+                    }
+                    ${
+                      type === "coverLetter"
+                        ? "border-purple-200 bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800"
+                        : ""
+                    }
+                    ${
+                      type === "linkedin"
+                        ? "border-indigo-200 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800"
+                        : ""
+                    }
                   `}
                 >
                   {getDocumentTypeName()}
                 </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 px-3 rounded-full relative z-30 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                  asChild
-                >
-                  <Link
-                    href={`/document/${getDocumentTypeUrl()}/${getDocumentId(doc)}`}
-                    onClick={(e) => e.stopPropagation()}
+                <div className="flex items-center gap-2 relative z-30">
+                  <ExportDropdown
+                    documentId={getDocumentId(doc)}
+                    documentType={type}
+                    documentTitle={getDocumentTitle(doc)}
+                    variant="ghost"
+                    size="sm"
+                    showLabel={false}
+                    className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-3 rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                    asChild
                   >
-                    <Pencil className="mr-2 h-3 w-3" />
-                    View
-                  </Link>
-                </Button>
+                    <Link
+                      href={`/document/${getDocumentTypeUrl()}/${getDocumentId(
+                        doc
+                      )}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Pencil className="mr-2 h-3 w-3" />
+                      View
+                    </Link>
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
           ))}
@@ -751,9 +801,13 @@ export function DocumentList({
             <Trash2 className="h-8 w-8 text-red-600" />
           </div>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-center text-xl">Delete {getDocumentTypeName()}</AlertDialogTitle>
+            <AlertDialogTitle className="text-center text-xl">
+              Delete {getDocumentTypeName()}
+            </AlertDialogTitle>
             <AlertDialogDescription className="text-center max-w-[400px] mx-auto">
-              Are you sure you want to delete this {getDocumentTypeName().toLowerCase()}? This action cannot be undone and all data will be permanently removed.
+              Are you sure you want to delete this{" "}
+              {getDocumentTypeName().toLowerCase()}? This action cannot be
+              undone and all data will be permanently removed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex flex-col sm:flex-row gap-2 mt-6">
@@ -770,5 +824,5 @@ export function DocumentList({
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
+  );
 }

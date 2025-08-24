@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,22 +8,27 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-import { ResumeForm } from "@/components/forms/resume-form"
-import { CoverLetterForm } from "@/components/forms/cover-letter-form"
-import { LinkedInForm } from "@/components/forms/linkedin-form"
-import { resumeAPI, coverLetterAPI, linkedinAPI } from "@/lib/api"
-import { useToast } from "@/hooks/use-toast"
-import { Loader2 } from "lucide-react"
-import type { DocumentType, ResumeFormData, CoverLetterFormData, LinkedInBioFormData } from "@/lib/types"
+import { ResumeForm } from "@/components/forms/resume-form";
+import { CoverLetterForm } from "@/components/forms/cover-letter-form";
+import { LinkedInForm } from "@/components/forms/linkedin-form";
+import { resumeAPI, coverLetterAPI, linkedinAPI } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+import type {
+  DocumentType,
+  ResumeFormData,
+  CoverLetterFormData,
+  LinkedInBioFormData,
+} from "@/lib/types";
 
 interface CreateDocumentDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  documentType: DocumentType
-  onDocumentCreated: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  documentType: DocumentType;
+  onDocumentCreated: () => void;
 }
 
 export function CreateDocumentDialog({
@@ -32,9 +37,8 @@ export function CreateDocumentDialog({
   documentType,
   onDocumentCreated,
 }: CreateDocumentDialogProps) {
-
-  const [loading, setLoading] = useState(false)
-  const { toast } = useToast()
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   // Form states
   const [resumeData, setResumeData] = useState<ResumeFormData>({
@@ -46,7 +50,7 @@ export function CreateDocumentDialog({
       education: "",
       additionalInfo: "",
     },
-  })
+  });
 
   const [coverLetterData, setCoverLetterData] = useState<CoverLetterFormData>({
     title: "",
@@ -58,7 +62,7 @@ export function CreateDocumentDialog({
       jobDescription: "",
       additionalInfo: "",
     },
-  })
+  });
 
   const [linkedinData, setLinkedinData] = useState<LinkedInBioFormData>({
     title: "",
@@ -82,38 +86,42 @@ export function CreateDocumentDialog({
       focusPoints: "",
       keywords: "",
     },
-  })
+  });
 
   const getTitle = () => {
     switch (documentType) {
       case "resume":
-        return "Create New Resume"
+        return "Create New Resume";
       case "coverLetter":
-        return "Create New Cover Letter"
+        return "Create New Cover Letter";
       case "linkedin":
-        return "Create New LinkedIn Bio"
+        return "Create New LinkedIn Bio";
       default:
-        return "Create New Document"
+        return "Create New Document";
     }
-  }
+  };
 
   const getDescription = () => {
     switch (documentType) {
       case "resume":
-        return "Fill in the details below to generate a professional resume tailored to your experience and skills."
+        return "Fill in the details below to generate a professional resume tailored to your experience and skills.";
       case "coverLetter":
-        return "Provide information about the job and your qualifications to create a personalized cover letter."
+        return "Provide information about the job and your qualifications to create a personalized cover letter.";
       case "linkedin":
-        return "Enter your professional details to create an engaging LinkedIn bio that highlights your expertise."
+        return "Enter your professional details to create an engaging LinkedIn bio that highlights your expertise.";
       default:
-        return "Fill in the details to create your document."
+        return "Fill in the details to create your document.";
     }
-  }
+  };
 
   const validateForm = () => {
     if (documentType === "resume") {
-      if (!resumeData.title || !resumeData.promptData.jobTitle ||
-          !resumeData.promptData.experience || !resumeData.promptData.education) {
+      if (
+        !resumeData.title ||
+        !resumeData.promptData.jobTitle ||
+        !resumeData.promptData.experience ||
+        !resumeData.promptData.education
+      ) {
         toast({
           title: "Missing information",
           description: "Please fill in all required fields for the resume",
@@ -122,61 +130,97 @@ export function CreateDocumentDialog({
         return false;
       }
     } else if (documentType === "coverLetter") {
-      if (!coverLetterData.title || !coverLetterData.promptData.jobTitle ||
-          !coverLetterData.promptData.companyName || !coverLetterData.promptData.experience) {
+      if (
+        !coverLetterData.title ||
+        !coverLetterData.promptData.jobTitle ||
+        !coverLetterData.promptData.companyName ||
+        !coverLetterData.promptData.experience
+      ) {
         toast({
           title: "Missing information",
-          description: "Please fill in all required fields for the cover letter",
+          description:
+            "Please fill in all required fields for the cover letter",
           variant: "destructive",
         });
         return false;
       }
     } else if (documentType === "linkedin") {
-      if (!linkedinData.title || !linkedinData.profile.firstName ||
-          !linkedinData.profile.lastName || !linkedinData.profile.location ||
-          !linkedinData.profile.industry || !linkedinData.profile.currentPosition ||
-          !linkedinData.experience.professionalExperience || !linkedinData.experience.education ||
-          !linkedinData.preferences.targetRole || !linkedinData.preferences.tone) {
+      if (
+        !linkedinData.title ||
+        !linkedinData.profile.firstName ||
+        !linkedinData.profile.lastName ||
+        !linkedinData.profile.location ||
+        !linkedinData.profile.industry ||
+        !linkedinData.profile.currentPosition ||
+        !linkedinData.experience.professionalExperience ||
+        !linkedinData.experience.education ||
+        !linkedinData.preferences.targetRole ||
+        !linkedinData.preferences.tone
+      ) {
         toast({
           title: "Missing information",
-          description: "Please fill in all required fields for the LinkedIn bio. Make sure to select a tone.",
+          description:
+            "Please fill in all required fields for the LinkedIn bio. Make sure to select a tone.",
           variant: "destructive",
         });
         return false;
       }
 
       // Validate that tone is one of the allowed values
-      if (!["professional", "friendly", "creative"].includes(linkedinData.preferences.tone)) {
+      if (
+        !["professional", "friendly", "creative"].includes(
+          linkedinData.preferences.tone
+        )
+      ) {
         toast({
           title: "Invalid tone",
-          description: "Please select a valid tone: professional, friendly, or creative",
+          description:
+            "Please select a valid tone: professional, friendly, or creative",
           variant: "destructive",
         });
         return false;
       }
     }
     return true;
-  }
+  };
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
       let response;
 
       if (documentType === "resume") {
-        console.log("Submitting resume data:", resumeData);
         response = await resumeAPI.generateResume(resumeData);
       } else if (documentType === "coverLetter") {
-        console.log("Submitting cover letter data:", coverLetterData);
         response = await coverLetterAPI.generateCoverLetter(coverLetterData);
       } else if (documentType === "linkedin") {
-        console.log("Submitting LinkedIn data:", linkedinData);
-        response = await linkedinAPI.generateLinkedInBio(linkedinData);
+        response = await linkedinAPI.generateLinkedInBio({
+          title: linkedinData.title,
+          profile: {
+            firstName: linkedinData.profile.firstName,
+            lastName: linkedinData.profile.lastName,
+            headline: linkedinData.profile.headline,
+            location: linkedinData.profile.location,
+            industry: linkedinData.profile.industry,
+            currentPosition: linkedinData.profile.currentPosition,
+          },
+          experience: {
+            skills: linkedinData.experience.skills,
+            professionalExperience:
+              linkedinData.experience.professionalExperience,
+            education: linkedinData.experience.education,
+            certifications: linkedinData.experience.certifications,
+          },
+          preferences: {
+            tone: linkedinData.preferences.tone,
+            targetRole: linkedinData.preferences.targetRole,
+            focusPoints: linkedinData.preferences.focusPoints,
+            keywords: linkedinData.preferences.keywords,
+          },
+        });
       }
-
-      console.log("Document created successfully:", response);
 
       // Reset form data
       setResumeData({
@@ -188,7 +232,7 @@ export function CreateDocumentDialog({
           education: "",
           additionalInfo: "",
         },
-      })
+      });
 
       setCoverLetterData({
         title: "",
@@ -200,7 +244,7 @@ export function CreateDocumentDialog({
           jobDescription: "",
           additionalInfo: "",
         },
-      })
+      });
 
       setLinkedinData({
         title: "",
@@ -224,39 +268,43 @@ export function CreateDocumentDialog({
           focusPoints: "",
           keywords: "",
         },
-      })
+      });
 
-      onDocumentCreated()
+      onDocumentCreated();
     } catch (error: any) {
-      console.error("Document creation error:", error);
-
       // Extract error message from response if available
-      const errorMessage = error.response?.data?.errors?.[0]?.msg ||
-                          error.response?.data?.error ||
-                          "There was an error creating your document. Please try again.";
+      const errorMessage =
+        error.response?.data?.errors?.[0]?.msg ||
+        error.response?.data?.error ||
+        "There was an error creating your document. Please try again.";
 
       toast({
         title: "Error creating document",
         description: errorMessage,
         variant: "destructive",
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const renderForm = () => {
     switch (documentType) {
       case "resume":
-        return <ResumeForm data={resumeData} onChange={setResumeData} />
+        return <ResumeForm data={resumeData} onChange={setResumeData} />;
       case "coverLetter":
-        return <CoverLetterForm data={coverLetterData} onChange={setCoverLetterData} />
+        return (
+          <CoverLetterForm
+            data={coverLetterData}
+            onChange={setCoverLetterData}
+          />
+        );
       case "linkedin":
-        return <LinkedInForm data={linkedinData} onChange={setLinkedinData} />
+        return <LinkedInForm data={linkedinData} onChange={setLinkedinData} />;
       default:
-        return <div>Form not available</div>
+        return <div>Form not available</div>;
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -273,7 +321,11 @@ export function CreateDocumentDialog({
         </div>
 
         <DialogFooter className="border-t pt-4 mt-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
             Cancel
           </Button>
           <Button type="submit" onClick={handleSubmit} disabled={loading}>
@@ -289,5 +341,5 @@ export function CreateDocumentDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

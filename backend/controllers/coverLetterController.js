@@ -1,9 +1,9 @@
 const CoverLetter = require("../models/CoverLetter");
-const geminiService = require("../utils/geminiService");
+const geminiServiceLatex = require("../utils/geminiServiceLatex");
 const responseFormatter = require("../utils/responseFormatter");
 
 /**
- * @desc    Generate a new cover letter
+ * @desc    Generate a new cover letter with LaTeX output
  * @route   POST /api/generate/cover-letter
  * @access  Private
  */
@@ -11,8 +11,39 @@ exports.generateCoverLetter = async (req, res, next) => {
   try {
     const { title, promptData } = req.body;
 
-    // Generate cover letter content using Gemini
-    const resultText = await geminiService.generateCoverLetter(promptData);
+    console.log(
+      "Generating cover letter with LaTeX service:",
+      JSON.stringify({ title, promptData }, null, 2)
+    );
+
+    // Validate required fields
+    if (!title || !promptData) {
+      return responseFormatter.error(res, "Title and prompt data are required", 400);
+    }
+
+    // Generate cover letter LaTeX content using enhanced Gemini service with user data
+    let resultText;
+    try {
+      resultText = await geminiServiceLatex.generateCoverLetter(promptData, req.user);
+      console.log("LaTeX generation successful, content length:", resultText.length);
+    } catch (geminiError) {
+      console.error("LaTeX generation failed:", geminiError);
+      return responseFormatter.error(
+        res, 
+        `Cover letter generation failed: ${geminiError.message}`, 
+        500
+      );
+    }
+
+    // Validate that we got valid LaTeX content
+    if (!resultText || !resultText.includes('\\documentclass')) {
+      console.error("Invalid LaTeX content generated");
+      return responseFormatter.error(
+        res, 
+        "Failed to generate valid LaTeX content", 
+        500
+      );
+    }
 
     // Create cover letter in database
     const coverLetter = await CoverLetter.create({
@@ -25,6 +56,8 @@ exports.generateCoverLetter = async (req, res, next) => {
     // Increment user's usage counter
     await req.user.incrementUsage("coverLetter");
 
+    console.log("Cover letter generated successfully with LaTeX content");
+
     responseFormatter.success(
       res,
       "Cover letter generated successfully",
@@ -32,6 +65,7 @@ exports.generateCoverLetter = async (req, res, next) => {
       201
     );
   } catch (err) {
+    console.error("Error generating cover letter:", err);
     next(err);
   }
 };
@@ -56,6 +90,8 @@ exports.getCoverLetters = async (req, res, next) => {
       .skip(startIndex)
       .limit(limit);
 
+    console.log(`Retrieved ${coverLetters.length} cover letters for user`);
+
     responseFormatter.pagination(
       res,
       coverLetters,
@@ -65,6 +101,7 @@ exports.getCoverLetters = async (req, res, next) => {
       "Cover letters retrieved successfully"
     );
   } catch (err) {
+    console.error("Error fetching cover letters:", err);
     next(err);
   }
 };
@@ -91,10 +128,13 @@ exports.getCoverLetter = async (req, res, next) => {
       );
     }
 
+    console.log("Retrieved single cover letter:", coverLetter._id);
+
     responseFormatter.success(res, "Cover letter retrieved successfully", {
       coverLetter,
     });
   } catch (err) {
+    console.error("Error fetching single cover letter:", err);
     next(err);
   }
 };

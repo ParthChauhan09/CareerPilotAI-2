@@ -19,10 +19,10 @@ module.exports = {
   // Gemini configuration
   gemini: {
     apiKey: process.env.GEMINI_API_KEY,
-    model: "gemini-2.0-flash", // Safe default model
+    model: "gemini-1.5-flash", // Safe default model
     fallbackModel: "gemini-pro", // Fallback model if primary is unavailable
     temperature: 0.7,
-    maxOutputTokens: 4096,
+    maxOutputTokens: 2048,
   },
 
   // Razorpay configuration
@@ -43,6 +43,7 @@ module.exports = {
         coverLetterGenerations: 1,
         linkedinGenerations: 1,
         pdfExport: true,
+        pdfPreview: true,
         docxExport: false,
         txtExport: true,
       },
@@ -56,6 +57,7 @@ module.exports = {
         coverLetterGenerations: 5,
         linkedinGenerations: 3,
         pdfExport: true,
+        pdfPreview: true,
         docxExport: true,
         txtExport: true,
       },
@@ -69,6 +71,7 @@ module.exports = {
         coverLetterGenerations: -1, // Unlimited
         linkedinGenerations: -1, // Unlimited
         pdfExport: true,
+        pdfPreview: true,
         docxExport: true,
         txtExport: true,
       },

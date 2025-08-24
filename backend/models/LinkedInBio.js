@@ -60,10 +60,9 @@ const LinkedInBioSchema = new mongoose.Schema({
     focusPoints: String,
     keywords: String,
   },
-  content: {
-    about: String,
-    headline: String,
-    experience: String,
+  resultText: {
+    type: String,
+    required: [true, "LinkedIn bio content is required"],
   },
   createdAt: {
     type: Date,

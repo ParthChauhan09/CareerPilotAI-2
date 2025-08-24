@@ -8,32 +8,32 @@ export const downloadFile = (data: any, filename: string, mimeType: string) => {
   try {
     // Create a blob with the data and MIME type
     const blob = new Blob([data], { type: mimeType });
-    
+
     // Create a URL for the blob
     const url = window.URL.createObjectURL(blob);
-    
+
     // Create a link element
     const link = document.createElement('a');
-    
+
     // Set the link's properties
     link.href = url;
     link.setAttribute('download', filename);
-    
+
     // Append the link to the body
     document.body.appendChild(link);
-    
+
     // Click the link to start the download
     link.click();
-    
+
     // Remove the link from the body
     link.remove();
-    
+
     // Release the URL object
     window.URL.revokeObjectURL(url);
-    
+
     return true;
   } catch (error) {
-    console.error('Error downloading file:', error);
+
     return false;
   }
 };
@@ -45,8 +45,8 @@ export const downloadFile = (data: any, filename: string, mimeType: string) => {
  */
 export const downloadPdf = (data: any, filename: string) => {
   return downloadFile(
-    data, 
-    filename.endsWith('.pdf') ? filename : `${filename}.pdf`, 
+    data,
+    filename.endsWith('.pdf') ? filename : `${filename}.pdf`,
     'application/pdf'
   );
 };
@@ -58,8 +58,8 @@ export const downloadPdf = (data: any, filename: string) => {
  */
 export const downloadDocx = (data: any, filename: string) => {
   return downloadFile(
-    data, 
-    filename.endsWith('.docx') ? filename : `${filename}.docx`, 
+    data,
+    filename.endsWith('.docx') ? filename : `${filename}.docx`,
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
   );
 };
@@ -71,8 +71,8 @@ export const downloadDocx = (data: any, filename: string) => {
  */
 export const downloadTxt = (data: any, filename: string) => {
   return downloadFile(
-    data, 
-    filename.endsWith('.txt') ? filename : `${filename}.txt`, 
+    data,
+    filename.endsWith('.txt') ? filename : `${filename}.txt`,
     'text/plain'
   );
 };

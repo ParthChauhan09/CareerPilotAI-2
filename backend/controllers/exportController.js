@@ -1,9 +1,7 @@
 const Resume = require("../models/Resume");
 const CoverLetter = require("../models/CoverLetter");
 const LinkedInBio = require("../models/LinkedInBio");
-const docxGenerator = require("../utils/docxGenerator");
-const simpleDocxGenerator = require("../utils/simpleDocxGenerator");
-const txtGenerator = require("../utils/txtGenerator");
+const latexCompiler = require("../utils/latexCompiler");
 const responseFormatter = require("../utils/responseFormatter");
 
 /**
@@ -38,25 +36,11 @@ exports.exportResumeDocx = async (req, res, next) => {
         : "No result text",
     });
 
-    // Extract name from job title or use defaults
-    let firstName = "First";
-    let lastName = "Last";
-
-    if (resume.promptData.jobTitle) {
-      // Use job title as name if no name is provided
-      const nameParts = resume.promptData.jobTitle.split(" ");
-      if (nameParts.length > 1) {
-        firstName = nameParts[0];
-        lastName = nameParts.slice(1).join(" ");
-      } else {
-        firstName = resume.promptData.jobTitle;
-      }
-    }
-
-    // Use the simple DOCX generator
-    const docxBuffer = await simpleDocxGenerator.generateSimpleDocx(
+    // Generate DOCX from LaTeX
+    const docxBuffer = await latexCompiler.compileToDocx(
       resume.resultText,
-      resume.title
+      resume.title.replace(/\s+/g, "_"),
+      resume.promptData
     );
 
     // Set response headers
@@ -108,38 +92,12 @@ exports.exportResumeTxt = async (req, res, next) => {
         : "No result text",
     });
 
-    // For TXT export, we can simply use the resultText directly
-    let txtContent = "";
-
-    if (resume.resultText) {
-      // Use the AI-generated content directly
-      txtContent = resume.resultText;
-    } else {
-      // Fallback to a simple formatted version using the prompt data
-      txtContent = `${resume.title.toUpperCase()}\n\n`;
-      txtContent += `JOB TITLE: ${resume.promptData.jobTitle || "N/A"}\n\n`;
-
-      txtContent += "SKILLS:\n";
-      if (
-        Array.isArray(resume.promptData.skills) &&
-        resume.promptData.skills.length > 0
-      ) {
-        txtContent += resume.promptData.skills.join(", ") + "\n\n";
-      } else {
-        txtContent += "N/A\n\n";
-      }
-
-      txtContent += "EXPERIENCE:\n";
-      txtContent += `${resume.promptData.experience || "N/A"}\n\n`;
-
-      txtContent += "EDUCATION:\n";
-      txtContent += `${resume.promptData.education || "N/A"}\n\n`;
-
-      if (resume.promptData.additionalInfo) {
-        txtContent += "ADDITIONAL INFORMATION:\n";
-        txtContent += `${resume.promptData.additionalInfo}\n`;
-      }
-    }
+    // Generate TXT from LaTeX
+    const txtContent = await latexCompiler.compileToTxt(
+      resume.resultText,
+      resume.title.replace(/\s+/g, "_"),
+      resume.promptData
+    );
 
     // Set response headers
     res.setHeader("Content-Type", "text/plain");
@@ -177,10 +135,11 @@ exports.exportCoverLetterDocx = async (req, res, next) => {
       );
     }
 
-    // Use the simple DOCX generator
-    const docxBuffer = await simpleDocxGenerator.generateSimpleDocx(
+    // Generate DOCX from LaTeX
+    const docxBuffer = await latexCompiler.compileToDocx(
       coverLetter.resultText,
-      coverLetter.title
+      coverLetter.title.replace(/\s+/g, "_"),
+      coverLetter.promptData
     );
 
     // Set response headers
@@ -225,22 +184,11 @@ exports.exportCoverLetterTxt = async (req, res, next) => {
       );
     }
 
-    // Generate TXT
-    const txtContent = txtGenerator.generateTxt(
-      {
-        job: {
-          title: coverLetter.promptData.jobTitle,
-          company: coverLetter.promptData.companyName,
-          hiringManager: coverLetter.promptData.hiringManager || "",
-        },
-        personal: {
-          firstName: coverLetter.promptData.firstName || "First",
-          lastName: coverLetter.promptData.lastName || "Last",
-        },
-        content: coverLetter.resultText,
-      },
-      "coverLetter",
-      coverLetter.title
+    // Generate TXT from LaTeX
+    const txtContent = await latexCompiler.compileToTxt(
+      coverLetter.resultText,
+      coverLetter.title.replace(/\s+/g, "_"),
+      coverLetter.promptData
     );
 
     // Set response headers
@@ -282,10 +230,11 @@ exports.exportLinkedInDocx = async (req, res, next) => {
       );
     }
 
-    // Use the simple DOCX generator
-    const docxBuffer = await simpleDocxGenerator.generateSimpleDocx(
-      linkedinBio.resultText || JSON.stringify(linkedinBio.content, null, 2),
-      linkedinBio.title
+    // Generate DOCX from LaTeX
+    const docxBuffer = await latexCompiler.compileToDocx(
+      linkedinBio.resultText,
+      linkedinBio.title.replace(/\s+/g, "_"),
+      linkedinBio.promptData
     );
 
     // Set response headers
@@ -330,14 +279,11 @@ exports.exportLinkedInTxt = async (req, res, next) => {
       );
     }
 
-    // Generate TXT
-    const txtContent = txtGenerator.generateTxt(
-      {
-        profile: linkedinBio.profile,
-        content: linkedinBio.content,
-      },
-      "linkedin",
-      linkedinBio.title
+    // Generate TXT from LaTeX
+    const txtContent = await latexCompiler.compileToTxt(
+      linkedinBio.resultText,
+      linkedinBio.title.replace(/\s+/g, "_"),
+      linkedinBio.promptData
     );
 
     // Set response headers
