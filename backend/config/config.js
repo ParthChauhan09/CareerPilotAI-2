@@ -22,7 +22,7 @@ module.exports = {
     model: "gemini-1.5-flash", // Safe default model
     fallbackModel: "gemini-pro", // Fallback model if primary is unavailable
     temperature: 0.7,
-    maxOutputTokens: 2048,
+    maxOutputTokens: 8192,
   },
 
   // Razorpay configuration

@@ -175,7 +175,7 @@ function extractRetryDelay(error, attempt) {
 async function generateLatexContent(prompt, options = {}) {
   const {
     temperature = 0.7,
-    maxOutputTokens = 3000,
+    maxOutputTokens = 8192,
     modelName = config.gemini?.model || "gemini-1.5-flash",
     maxRetries = 3,
   } = options;
@@ -324,10 +324,10 @@ async function generateResume(promptData, user = null) {
       Now, generate the final completed LaTeX resume following all critical requirements.
     `;
 
-    // Use smaller token budget and no retries to reduce quota pressure
+    // Use higher token budget to prevent truncation
     return await generateLatexContent(prompt, {
       modelName: config.gemini?.model || "gemini-1.5-flash",
-      maxOutputTokens: Math.min(2000, config.gemini?.maxOutputTokens || 3000),
+      maxOutputTokens: 8192,
       maxRetries: 0,
       temperature: 0.6,
     });
@@ -434,7 +434,7 @@ async function generateCoverLetter(promptData, user = null) {
 
     return await generateLatexContent(prompt, {
       modelName: config.gemini?.model || "gemini-1.5-flash",
-      maxOutputTokens: 2048,
+      maxOutputTokens: 8192,
       maxRetries: 0,
       temperature: 0.6,
     });
@@ -519,7 +519,7 @@ async function generateLinkedInBio(data, user = null) {
     `;
     return await generateLatexContent(prompt, {
       modelName: config.gemini?.model || "gemini-1.5-flash",
-      maxOutputTokens: 2048,
+      maxOutputTokens: 8192,
       maxRetries: 0,
       temperature: 0.6,
     });
