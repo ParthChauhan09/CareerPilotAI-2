@@ -5,14 +5,14 @@ import { ArrowRight, CheckCircle2 } from "lucide-react"
 
 export function LandingHero() {
   return (
-    <section className="relative w-full overflow-hidden pt-4 pb-8 md:pt-6 md:pb-16 lg:pt-8 lg:pb-20">
+    <section className="relative w-full max-w-full overflow-hidden pt-4 pb-8 md:pt-6 md:pb-16 lg:pt-8 lg:pb-20">
       {/* Background gradient effects */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/10 via-background/50 to-background opacity-50" />
       <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_center,rgba(var(--primary-rgb),0.12),transparent_50%)]" />
       <div className="absolute top-0 right-0 -z-10 h-[500px] w-[500px] rounded-full bg-primary/5 blur-3xl" />
       <div className="absolute bottom-0 left-0 -z-10 h-[500px] w-[500px] rounded-full bg-primary/5 blur-3xl" />
 
-      <div className="container px-4 md:px-6">
+      <div className="w-full max-w-none px-4 md:px-6">
         <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
           <div className="flex flex-col justify-center space-y-8">
             <div className="space-y-6 animate-fade-in">
@@ -34,7 +34,7 @@ export function LandingHero() {
                   </li>
                   <li className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
-                    <span>Multiple export formats (PDF, DOCX, TXT)</span>
+                    <span>Multiple export formats (PDF, TXT)</span>
                   </li>
                   <li className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CheckCircle2 className="h-4 w-4 text-primary" />

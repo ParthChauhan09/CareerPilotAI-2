@@ -7,7 +7,7 @@ import { config } from "@/lib/config"
 export function LandingPricing() {
   return (
     <section id="pricing" className="w-full py-8 md:py-16 lg:py-24">
-      <div className="container px-4 md:px-6">
+      <div className="w-full max-w-none px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">Pricing</div>

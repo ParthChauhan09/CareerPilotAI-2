@@ -4,7 +4,7 @@ import { Briefcase, Mail, MapPin, Phone } from "lucide-react"
 export function LandingFooter() {
   return (
     <footer className="w-full border-t py-12 md:py-16">
-      <div className="container px-4 md:px-6">
+      <div className="w-full max-w-none px-4 md:px-6">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
             <div className="flex items-center gap-2">

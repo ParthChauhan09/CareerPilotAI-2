@@ -10,8 +10,6 @@ const inter = Inter({ subsets: ["latin"] })
 
 // Force dynamic rendering to avoid SSG issues
 export const dynamic = 'force-dynamic'
-export const runtime = 'nodejs'
-export const revalidate = 0
 
 export const metadata: Metadata = {
   title: "CareerPilotAI",
@@ -29,7 +27,7 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased transition-colors duration-300`}>
         <AuthProvider>
           <ThemeProvider>
-            <div className="animate-fade-in [animation-delay:100ms] transition-all duration-300">
+            <div className="animate-fade-in [animation-delay:100ms] transition-all duration-300 w-full">
               {children}
             </div>
             <Toaster />
