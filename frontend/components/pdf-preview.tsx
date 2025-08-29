@@ -63,13 +63,13 @@ export function PDFPreview({
       
       switch (documentType) {
         case "resume":
-          endpoint = `/api/pdf/resume/${documentId}/preview`;
+          endpoint = `/pdf/resume/${documentId}/preview`;
           break;
         case "coverLetter":
-          endpoint = `/api/pdf/cover-letter/${documentId}/preview`;
+          endpoint = `/pdf/cover-letter/${documentId}/preview`;
           break;
         case "linkedin":
-          endpoint = `/api/pdf/linkedin/${documentId}/preview`;
+          endpoint = `/pdf/linkedin/${documentId}/preview`;
           break;
         default:
           throw new Error(`Unknown document type: ${documentType}`);
