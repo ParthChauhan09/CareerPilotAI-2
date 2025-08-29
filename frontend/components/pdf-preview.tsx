@@ -27,7 +27,7 @@ export function PDFPreview({
   const { toast } = useToast();
 
   const getPreviewUrl = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
     const token = localStorage.getItem("token");
     
     let endpoint = "";
@@ -58,7 +58,7 @@ export function PDFPreview({
         throw new Error("Authentication required");
       }
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
       let endpoint = "";
       
       switch (documentType) {
