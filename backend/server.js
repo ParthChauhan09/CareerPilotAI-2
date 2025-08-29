@@ -17,9 +17,6 @@ const app = express();
 //app.use(cors());
 app.use(
   cors({
-    origin: ["https://careerpilotairesume.vercel.app",
-      "http://localhost:3000"
-    ], // your Vercel frontend
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, 
   })
