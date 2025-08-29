@@ -81,17 +81,6 @@ export function PDFPreview({
         },
       });
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Authentication required. Please log in again.");
-        } else if (response.status === 404) {
-          throw new Error("Document not found");
-        } else {
-          const errorData = await response.text();
-          throw new Error(`Failed to load PDF preview: ${errorData}`);
-        }
-      }
-
       // Create blob URL for PDF
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
