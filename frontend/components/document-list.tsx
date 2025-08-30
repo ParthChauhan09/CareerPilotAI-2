@@ -727,10 +727,12 @@ export function DocumentList({
                         className="block mt-2 hover:bg-muted/50 transition-colors rounded"
                       >
                         <div className="line-clamp-2 text-xs p-2 rounded bg-muted/30 border border-muted/50 italic">
-                          {content.length > 150
-                            ? content.substring(0, 150).replace(/\n/g, " ") +
-                              "..."
-                            : content.replace(/\n/g, " ")}
+                          {typeof content === "string"
+                            ? content.length > 150
+                              ? content.substring(0, 150).replace(/\n/g, " ") +
+                                "..."
+                              : content.replace(/\n/g, " ")
+                            : null}
                         </div>
                       </Link>
                     ) : null;
