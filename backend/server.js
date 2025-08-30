@@ -15,13 +15,7 @@ const app = express();
 
 // Middleware
 //app.use(cors());
-app.use(
-  cors({
-    origin: "https://careerpilotairesume.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, 
-  })
-);
+
 app.use(express.json({ limit: "10mb" }));
 
 // Special handling for Razorpay webhook
