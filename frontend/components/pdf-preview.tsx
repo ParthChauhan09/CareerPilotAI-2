@@ -27,7 +27,7 @@ export function PDFPreview({
   const { toast } = useToast();
 
   const getPreviewUrl = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
     const token = localStorage.getItem("token");
     
     let endpoint = "";
@@ -58,18 +58,18 @@ export function PDFPreview({
         throw new Error("Authentication required");
       }
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
       let endpoint = "";
       
       switch (documentType) {
         case "resume":
-          endpoint = `/api/pdf/resume/${documentId}/preview`;
+          endpoint = `/pdf/resume/${documentId}/preview`;
           break;
         case "coverLetter":
-          endpoint = `/api/pdf/cover-letter/${documentId}/preview`;
+          endpoint = `/pdf/cover-letter/${documentId}/preview`;
           break;
         case "linkedin":
-          endpoint = `/api/pdf/linkedin/${documentId}/preview`;
+          endpoint = `/pdf/linkedin/${documentId}/preview`;
           break;
         default:
           throw new Error(`Unknown document type: ${documentType}`);
@@ -80,17 +80,6 @@ export function PDFPreview({
           "Authorization": `Bearer ${token}`,
         },
       });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Authentication required. Please log in again.");
-        } else if (response.status === 404) {
-          throw new Error("Document not found");
-        } else {
-          const errorData = await response.text();
-          throw new Error(`Failed to load PDF preview: ${errorData}`);
-        }
-      }
 
       // Create blob URL for PDF
       const blob = await response.blob();
