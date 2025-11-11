@@ -130,9 +130,9 @@ export default function PrivacyPolicyPage() {
               If you have any questions about this Privacy Policy or our data practices, please contact us:
             </p>
             <div className="bg-muted p-4 rounded-lg">
-              <p><strong>Email:</strong> privacy@careerpilotai.com</p>
+              <p><strong>Email:</strong> chauhanparth6100.com</p>
               <p><strong>Address:</strong> CareerPilotAI, India</p>
-              <p><strong>Phone:</strong> +91-XXXXXXXXXX</p>
+              <p><strong>Phone:</strong> +91-7048610747</p>
             </div>
           </section>
 

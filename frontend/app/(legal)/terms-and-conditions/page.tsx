@@ -159,9 +159,9 @@ export default function TermsAndConditionsPage() {
               For questions about these Terms and Conditions, please contact us:
             </p>
             <div className="bg-muted p-4 rounded-lg">
-              <p><strong>Email:</strong> legal@careerpilotai.com</p>
+              <p><strong>Email:</strong> chauhanparth6100@.com</p>
               <p><strong>Address:</strong> CareerPilotAI, India</p>
-              <p><strong>Phone:</strong> +91-XXXXXXXXXX</p>
+              <p><strong>Phone:</strong> +91-7048610747</p>
             </div>
           </section>
 

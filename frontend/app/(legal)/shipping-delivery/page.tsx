@@ -179,9 +179,9 @@ export default function ShippingDeliveryPage() {
               If you experience any issues with service delivery or access, please contact us:
             </p>
             <div className="bg-muted p-4 rounded-lg">
-              <p><strong>Technical Support:</strong> support@careerpilotai.com</p>
-              <p><strong>Account Issues:</strong> accounts@careerpilotai.com</p>
-              <p><strong>Phone:</strong> +91-XXXXXXXXXX</p>
+              <p><strong>Technical Support:</strong> chauhanparth6100@gmail.com</p>
+              <p><strong>Account Issues:</strong> chauhanparth6100@gmail.com</p>
+              <p><strong>Phone:</strong> +91-7048610747</p>
               <p><strong>Response Time:</strong> Within 24 hours on business days</p>
               <p><strong>Emergency Support:</strong> Available for critical access issues</p>
             </div>

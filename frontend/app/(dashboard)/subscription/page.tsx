@@ -16,7 +16,7 @@ export default function SubscriptionPage() {
   const [plans, setPlans] = useState<Plan[]>([])
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
-  const [subscribing, setSubscribing] = useState(false)
+  const [subscribingPlan, setSubscribingPlan] = useState<string | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -113,7 +113,7 @@ export default function SubscriptionPage() {
   }
 
   const handleSubscribe = async (planType: string) => {
-    setSubscribing(true)
+    setSubscribingPlan(planType)
     try {
       const res = await paymentAPI.createOrder({ planType })
       const { orderId, amount, currency, keyId, planName, userEmail, userName } = res.data
@@ -160,7 +160,7 @@ export default function SubscriptionPage() {
         },
         modal: {
           ondismiss: function () {
-            setSubscribing(false)
+            setSubscribingPlan(null)
           },
         },
       }
@@ -178,7 +178,7 @@ export default function SubscriptionPage() {
           description: "Failed to load payment gateway. Please try again.",
           variant: "destructive",
         })
-        setSubscribing(false)
+        setSubscribingPlan(null)
       }
       document.body.appendChild(script)
     } catch (error) {
@@ -187,7 +187,7 @@ export default function SubscriptionPage() {
         description: "Could not process your subscription request. Please try again.",
         variant: "destructive",
       })
-      setSubscribing(false)
+      setSubscribingPlan(null)
     }
   }
 
@@ -244,10 +244,10 @@ export default function SubscriptionPage() {
                   <Button
                     className="w-full"
                     variant={isCurrentPlan ? "outline" : "default"}
-                    disabled={isCurrentPlan || subscribing}
+                    disabled={isCurrentPlan || subscribingPlan === plan.name.toLowerCase()}
                     onClick={() => handleSubscribe(plan.name.toLowerCase())}
                   >
-                    {subscribing ? (
+                    {subscribingPlan === plan.name.toLowerCase() ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Processing...

@@ -82,19 +82,19 @@ export default function ContactUsPage() {
               <CardContent className="space-y-3">
                 <div>
                   <p className="font-medium">General Support</p>
-                  <p className="text-sm text-muted-foreground">support@careerpilotai.com</p>
+                  <p className="text-sm text-muted-foreground">chauhanparth6100@gmail.com</p>
                 </div>
                 <div>
                   <p className="font-medium">Technical Issues</p>
-                  <p className="text-sm text-muted-foreground">tech@careerpilotai.com</p>
+                  <p className="text-sm text-muted-foreground">chauhanparth6100@gmail.com</p>
                 </div>
                 <div>
                   <p className="font-medium">Billing & Payments</p>
-                  <p className="text-sm text-muted-foreground">billing@careerpilotai.com</p>
+                  <p className="text-sm text-muted-foreground">chauhanparth6100@gmail.com</p>
                 </div>
                 <div>
                   <p className="font-medium">Legal & Privacy</p>
-                  <p className="text-sm text-muted-foreground">legal@careerpilotai.com</p>
+                  <p className="text-sm text-muted-foreground">chauhanparth6100@gmail.com</p>
                 </div>
               </CardContent>
             </Card>
@@ -107,7 +107,7 @@ export default function ContactUsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="font-medium">+91-XXXXXXXXXX</p>
+                <p className="font-medium">+91-7048610747</p>
                 <p className="text-sm text-muted-foreground mt-1">
                   Monday to Friday: 9:00 AM - 6:00 PM IST
                 </p>
@@ -124,8 +124,8 @@ export default function ContactUsPage() {
               <CardContent>
                 <p className="text-sm">
                   CareerPilotAI Technologies<br />
-                  [Your Office Address]<br />
-                  [City, State - PIN Code]<br />
+                  Ahmedabad, Gujarat<br />
+                  380009<br />
                   India
                 </p>
               </CardContent>

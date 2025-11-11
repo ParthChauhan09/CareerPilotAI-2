@@ -170,7 +170,7 @@ export default function CancellationRefundPage() {
             <div className="bg-muted p-4 rounded-lg">
               <p><strong>Refunds:</strong> refunds@careerpilotai.com</p>
               <p><strong>Support:</strong> support@careerpilotai.com</p>
-              <p><strong>Phone:</strong> +91-XXXXXXXXXX</p>
+              <p><strong>Phone:</strong> +91-7048610747</p>
               <p><strong>Business Hours:</strong> Monday to Friday, 9:00 AM to 6:00 PM IST</p>
             </div>
           </section>
