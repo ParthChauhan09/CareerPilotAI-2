@@ -27,7 +27,7 @@ export function PDFPreview({
   const { toast } = useToast();
 
   const getPreviewUrl = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
     const token = localStorage.getItem("token");
     
     let endpoint = "";
@@ -58,22 +58,18 @@ export function PDFPreview({
         throw new Error("Authentication required");
       }
 
-<<<<<<< HEAD
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
-=======
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
->>>>>>> nextjs-merge
       let endpoint = "";
       
       switch (documentType) {
         case "resume":
-          endpoint = `/pdf/resume/${documentId}/preview`;
+          endpoint = `/api/pdf/resume/${documentId}/preview`;
           break;
         case "coverLetter":
-          endpoint = `/pdf/cover-letter/${documentId}/preview`;
+          endpoint = `/api/pdf/cover-letter/${documentId}/preview`;
           break;
         case "linkedin":
-          endpoint = `/pdf/linkedin/${documentId}/preview`;
+          endpoint = `/api/pdf/linkedin/${documentId}/preview`;
           break;
         default:
           throw new Error(`Unknown document type: ${documentType}`);
