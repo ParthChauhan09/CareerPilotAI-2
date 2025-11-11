@@ -58,7 +58,7 @@ export function PDFPreview({
         throw new Error("Authentication required");
       }
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
       let endpoint = "";
       
       switch (documentType) {
