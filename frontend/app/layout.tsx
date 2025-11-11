@@ -14,7 +14,6 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: "CareerPilotAI",
   description: "Generate professional resumes, cover letters, and LinkedIn bios",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({

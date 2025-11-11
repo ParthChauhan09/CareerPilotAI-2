@@ -176,7 +176,7 @@ async function generateLatexContent(prompt, options = {}) {
   const {
     temperature = 0.7,
     maxOutputTokens = 8192,
-    modelName = config.gemini?.model || "gemini-1.5-flash",
+    modelName = config.gemini?.model || "gemini-2.5-flash",
     maxRetries = 3,
   } = options;
 
@@ -199,50 +199,72 @@ async function generateLatexContent(prompt, options = {}) {
     throw new GeminiError("Gemini API not initialized", 503);
   }
 
+  // Get list of models to try (primary + fallbacks)
+  const modelsToTry = [modelName];
+  if (config.gemini?.fallbackModels) {
+    config.gemini.fallbackModels.forEach(fallbackModel => {
+      if (!modelsToTry.includes(fallbackModel)) {
+        modelsToTry.push(fallbackModel);
+      }
+    });
+  }
+
   let lastError;
 
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      const model = genAI.getGenerativeModel({ model: modelName });
+  // Try each model in sequence
+  for (const currentModel of modelsToTry) {
+    console.log(`Attempting generation with model: ${currentModel}`);
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const model = genAI.getGenerativeModel({ model: currentModel });
 
-      const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature,
-          maxOutputTokens,
-        },
-      });
-
-      const response = result?.response;
-      const rawContent = response?.text();
-
-      if (!rawContent) {
-        throw new Error("Empty response from Gemini API");
-      }
-
-      const validatedContent = validateAndCleanLatex(rawContent);
-
-      // NEW: Store successful result in cache if in development
-      if (isDevelopment) {
-        requestCache.set(cacheKey, {
-          content: validatedContent,
-          timestamp: Date.now()
+        const result = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature,
+            maxOutputTokens,
+          },
         });
+
+        const response = result?.response;
+        const rawContent = response?.text();
+
+        if (!rawContent) {
+          throw new Error("Empty response from Gemini API");
+        }
+
+        const validatedContent = validateAndCleanLatex(rawContent);
+
+        // NEW: Store successful result in cache if in development
+        if (isDevelopment) {
+          requestCache.set(cacheKey, {
+            content: validatedContent,
+            timestamp: Date.now()
+          });
+        }
+
+        console.log(`✓ Successfully generated content with model: ${currentModel}`);
+        return validatedContent;
+      } catch (error) {
+        console.error(`Gemini LaTeX generation error with ${currentModel} (attempt ${attempt + 1}):`, error);
+        lastError = error;
+
+        // If it's a model not found error (404), break retry loop and try next model
+        if (error.status === 404 || error.message?.includes('not found') || error.message?.includes('404')) {
+          console.log(`Model ${currentModel} not available, trying next model...`);
+          break;
+        }
+
+        // Don't retry on the last attempt or if the error is not retryable
+        if (attempt === maxRetries || !shouldRetryError(error)) {
+          break;
+        }
+
+        const delay = extractRetryDelay(error, attempt);
+        console.log(`Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
-
-      return validatedContent;
-    } catch (error) {
-      console.error(`Gemini LaTeX generation error (attempt ${attempt + 1}):`, error);
-      lastError = error;
-
-      // Don't retry on the last attempt or if the error is not retryable
-      if (attempt === maxRetries || !shouldRetryError(error)) {
-        break;
-      }
-
-      const delay = extractRetryDelay(error, attempt);
-      console.log(`Retrying in ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
 
@@ -252,7 +274,7 @@ async function generateLatexContent(prompt, options = {}) {
   }
 
   // Throw a generic error for other failures
-  throw new GeminiError(`LaTeX generation failed after ${maxRetries + 1} attempts: ${lastError.message}`, 500);
+  throw new GeminiError(`LaTeX generation failed after trying all available models: ${lastError.message}`, 500);
 }
 
 
@@ -326,7 +348,7 @@ async function generateResume(promptData, user = null) {
 
     // Use higher token budget to prevent truncation
     return await generateLatexContent(prompt, {
-      modelName: config.gemini?.model || "gemini-1.5-flash",
+      modelName: config.gemini?.model || "gemini-2.5-flash",
       maxOutputTokens: 8192,
       maxRetries: 0,
       temperature: 0.6,
@@ -433,7 +455,7 @@ async function generateCoverLetter(promptData, user = null) {
     `;
 
     return await generateLatexContent(prompt, {
-      modelName: config.gemini?.model || "gemini-1.5-flash",
+      modelName: config.gemini?.model || "gemini-2.5-flash",
       maxOutputTokens: 8192,
       maxRetries: 0,
       temperature: 0.6,
@@ -518,7 +540,7 @@ async function generateLinkedInBio(data, user = null) {
       Generate engaging, professional content for each bracketed placeholder.
     `;
     return await generateLatexContent(prompt, {
-      modelName: config.gemini?.model || "gemini-1.5-flash",
+      modelName: config.gemini?.model || "gemini-2.5-flash",
       maxOutputTokens: 8192,
       maxRetries: 0,
       temperature: 0.6,

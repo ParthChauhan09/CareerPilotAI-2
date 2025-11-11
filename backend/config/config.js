@@ -19,10 +19,14 @@ module.exports = {
   // Gemini configuration
   gemini: {
     apiKey: process.env.GEMINI_API_KEY,
-    model: "gemini-1.5-flash", // Safe default model
-    fallbackModel: "gemini-pro", // Fallback model if primary is unavailable
-    temperature: 0.7,
-    maxOutputTokens: 8192,
+    model: process.env.GEMINI_MODEL || "gemini-2.5-flash", // Updated to current stable model (2025)
+    fallbackModels: [
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-1.5-pro"
+    ], // Multiple fallback options for reliability
+    temperature: parseFloat(process.env.GEMINI_TEMPERATURE) || 0.7,
+    maxOutputTokens: parseInt(process.env.GEMINI_MAX_TOKENS) || 8192,
   },
 
   // Razorpay configuration
