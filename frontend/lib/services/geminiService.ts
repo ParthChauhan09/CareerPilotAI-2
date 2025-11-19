@@ -13,103 +13,103 @@ const genAI = new GoogleGenerativeAI(serverConfig.gemini.apiKey);
  * Generate resume content using Gemini
  */
 export async function generateResume(promptData: any, user?: any): Promise<string> {
-  try {
-    const model = genAI.getGenerativeModel({
-      model: serverConfig.gemini.model,
-    });
+    try {
+        const model = genAI.getGenerativeModel({
+            model: serverConfig.gemini.model,
+        });
 
-    const prompt = buildResumePrompt(promptData);
+        const prompt = buildResumePrompt(promptData);
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text();
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        let text = response.text();
 
-    // Validate and ensure LaTeX format
-    if (!text.includes("\\documentclass")) {
-      text = wrapInLatex(text, "resume");
+        // Validate and ensure LaTeX format
+        if (!text.includes("\\documentclass")) {
+            text = wrapInLatex(text, "resume");
+        }
+
+        return text;
+    } catch (error) {
+        console.error("Error generating resume:", error);
+        throw new Error(
+            `Failed to generate resume: ${error instanceof Error ? error.message : "Unknown error"}`
+        );
     }
-
-    return text;
-  } catch (error) {
-    console.error("Error generating resume:", error);
-    throw new Error(
-      `Failed to generate resume: ${error instanceof Error ? error.message : "Unknown error"}`
-    );
-  }
 }
 
 /**
  * Generate cover letter content using Gemini
  */
 export async function generateCoverLetter(
-  promptData: any,
-  user?: any
+    promptData: any,
+    user?: any
 ): Promise<string> {
-  try {
-    const model = genAI.getGenerativeModel({
-      model: serverConfig.gemini.model,
-    });
+    try {
+        const model = genAI.getGenerativeModel({
+            model: serverConfig.gemini.model,
+        });
 
-    const prompt = buildCoverLetterPrompt(promptData);
+        const prompt = buildCoverLetterPrompt(promptData);
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text();
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        let text = response.text();
 
-    // Validate and ensure LaTeX format
-    if (!text.includes("\\documentclass")) {
-      text = wrapInLatex(text, "letter");
+        // Validate and ensure LaTeX format
+        if (!text.includes("\\documentclass")) {
+            text = wrapInLatex(text, "letter");
+        }
+
+        return text;
+    } catch (error) {
+        console.error("Error generating cover letter:", error);
+        throw new Error(
+            `Failed to generate cover letter: ${error instanceof Error ? error.message : "Unknown error"}`
+        );
     }
-
-    return text;
-  } catch (error) {
-    console.error("Error generating cover letter:", error);
-    throw new Error(
-      `Failed to generate cover letter: ${error instanceof Error ? error.message : "Unknown error"}`
-    );
-  }
 }
 
 /**
  * Generate LinkedIn bio content using Gemini
  */
 export async function generateLinkedInBio(
-  promptData: any,
-  user?: any
+    promptData: any,
+    user?: any
 ): Promise<string> {
-  try {
-    const model = genAI.getGenerativeModel({
-      model: serverConfig.gemini.model,
-    });
+    try {
+        const model = genAI.getGenerativeModel({
+            model: serverConfig.gemini.model,
+        });
 
-    const prompt = buildLinkedInBioPrompt(promptData);
+        const prompt = buildLinkedInBioPrompt(promptData);
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
 
-    return text;
-  } catch (error) {
-    console.error("Error generating LinkedIn bio:", error);
-    throw new Error(
-      `Failed to generate LinkedIn bio: ${error instanceof Error ? error.message : "Unknown error"}`
-    );
-  }
+        return text;
+    } catch (error) {
+        console.error("Error generating LinkedIn bio:", error);
+        throw new Error(
+            `Failed to generate LinkedIn bio: ${error instanceof Error ? error.message : "Unknown error"}`
+        );
+    }
 }
 
 /**
  * Build resume generation prompt
  */
 function buildResumePrompt(promptData: any): string {
-  const {
-    jobTitle = "Professional",
-    skills = [],
-    experience = "",
-    education = "",
-    additionalInfo = "",
-  } = promptData;
+    const {
+        jobTitle = "Professional",
+        skills = [],
+        experience = "",
+        education = "",
+        additionalInfo = "",
+    } = promptData;
 
-  return `Generate a professional resume in LaTeX format for the following profile:
+    return `Generate a professional resume in LaTeX format for the following profile:
 
 Job Title: ${jobTitle}
 Skills: ${Array.isArray(skills) ? skills.join(", ") : skills}
@@ -130,16 +130,16 @@ Requirements:
  * Build cover letter generation prompt
  */
 function buildCoverLetterPrompt(promptData: any): string {
-  const {
-    jobTitle = "Position",
-    companyName = "Company",
-    skills = [],
-    experience = "",
-    jobDescription = "",
-    additionalInfo = "",
-  } = promptData;
+    const {
+        jobTitle = "Position",
+        companyName = "Company",
+        skills = [],
+        experience = "",
+        jobDescription = "",
+        additionalInfo = "",
+    } = promptData;
 
-  return `Generate a professional cover letter in LaTeX format for the following:
+    return `Generate a professional cover letter in LaTeX format for the following:
 
 Job Title: ${jobTitle}
 Company: ${companyName}
@@ -162,30 +162,30 @@ Requirements:
  * Build LinkedIn bio generation prompt
  */
 function buildLinkedInBioPrompt(promptData: any): string {
-  const profile = promptData.profile || {};
-  const experience = promptData.experience || {};
-  const preferences = promptData.preferences || {};
+    const profile = promptData.profile || {};
+    const experience = promptData.experience || {};
+    const preferences = promptData.preferences || {};
 
-  const {
-    firstName = "Professional",
-    lastName = "",
-    headline = "",
-    location = "",
-    industry = "",
-    currentPosition = "",
-  } = profile;
+    const {
+        firstName = "Professional",
+        lastName = "",
+        headline = "",
+        location = "",
+        industry = "",
+        currentPosition = "",
+    } = profile;
 
-  const {
-    skills = "",
-    professionalExperience = "",
-    education = "",
-    certifications = "",
-  } = experience;
+    const {
+        skills = "",
+        professionalExperience = "",
+        education = "",
+        certifications = "",
+    } = experience;
 
-  const { tone = "professional", targetRole = "", focusPoints = "", keywords = "" } =
-    preferences;
+    const { tone = "professional", targetRole = "", focusPoints = "", keywords = "" } =
+        preferences;
 
-  return `Generate a compelling LinkedIn bio for:
+    return `Generate a compelling LinkedIn bio for:
 
 Name: ${firstName} ${lastName}
 Current Position: ${currentPosition}
@@ -215,7 +215,7 @@ Requirements:
  * Wrap plain text content in LaTeX document structure
  */
 function wrapInLatex(content: string, type: "resume" | "letter" = "resume"): string {
-  const preamble = `\\documentclass{article}
+    const preamble = `\\documentclass{article}
 \\usepackage[margin=1in]{geometry}
 \\usepackage{hyperref}
 \\usepackage{fancyhdr}
@@ -226,44 +226,44 @@ function wrapInLatex(content: string, type: "resume" | "letter" = "resume"): str
 \\begin{document}
 `;
 
-  const closing = `\\end{document}`;
+    const closing = `\\end{document}`;
 
-  // Clean up the content
-  let cleanedContent = content
-    .replace(/^#+\s+/gm, "\\section{") // Convert markdown headers to sections
-    .replace(/\n/g, "\n");
+    // Clean up the content
+    let cleanedContent = content
+        .replace(/^#+\s+/gm, "\\section{") // Convert markdown headers to sections
+        .replace(/\n/g, "\n");
 
-  // If content doesn't have any LaTeX commands, wrap in basic structure
-  if (!cleanedContent.includes("\\")) {
-    cleanedContent = cleanedContent
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0)
-      .map((line) => {
-        // Convert bold markdown
-        line = line.replace(/\*\*(.*?)\*\*/g, "\\textbf{$1}");
-        // Convert italic markdown
-        line = line.replace(/\*(.*?)\*/g, "\\textit{$1}");
-        return line;
-      })
-      .join("\n\n");
-  }
+    // If content doesn't have any LaTeX commands, wrap in basic structure
+    if (!cleanedContent.includes("\\")) {
+        cleanedContent = cleanedContent
+            .split("\n")
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0)
+            .map((line) => {
+                // Convert bold markdown
+                line = line.replace(/\*\*(.*?)\*\*/g, "\\textbf{$1}");
+                // Convert italic markdown
+                line = line.replace(/\*(.*?)\*/g, "\\textit{$1}");
+                return line;
+            })
+            .join("\n\n");
+    }
 
-  return `${preamble}${cleanedContent}\n${closing}`;
+    return `${preamble}${cleanedContent}\n${closing}`;
 }
 
 /**
  * Fallback content generators (in case Gemini fails)
  */
 export function getResumeFallback(promptData: any): string {
-  const {
-    jobTitle = "Professional",
-    skills = [],
-    experience = "",
-    education = "",
-  } = promptData;
+    const {
+        jobTitle = "Professional",
+        skills = [],
+        experience = "",
+        education = "",
+    } = promptData;
 
-  return `\\documentclass{article}
+    return `\\documentclass{article}
 \\usepackage[margin=1in]{geometry}
 \\begin{document}
 
@@ -285,9 +285,9 @@ ${education || "Education details available upon request"}
 }
 
 export function getCoverLetterFallback(promptData: any): string {
-  const { jobTitle = "Position", companyName = "Company" } = promptData;
+    const { jobTitle = "Position", companyName = "Company" } = promptData;
 
-  return `\\documentclass{article}
+    return `\\documentclass{article}
 \\usepackage[margin=1in]{geometry}
 \\begin{document}
 
@@ -306,9 +306,9 @@ Sincerely,
 }
 
 export function getLinkedInBioFallback(profile: any): string {
-  const { firstName = "Professional", currentPosition = "", headline = "" } = profile;
+    const { firstName = "Professional", currentPosition = "", headline = "" } = profile;
 
-  return `${firstName} | ${currentPosition || "Professional"} ${headline ? `| ${headline}` : ""}
+    return `${firstName} | ${currentPosition || "Professional"} ${headline ? `| ${headline}` : ""}
 
 Dedicated professional with a passion for excellence and continuous growth.`;
 }
