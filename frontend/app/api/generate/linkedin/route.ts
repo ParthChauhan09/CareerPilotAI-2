@@ -3,6 +3,7 @@ import connectDB from '@/lib/db';
 import LinkedInBio from '@/models/LinkedInBio';
 import { protect, checkUsageLimit } from '@/lib/middleware/auth';
 import { handleError } from '@/lib/middleware/errorHandler';
+import { generateLinkedInBio, getLinkedInBioFallback } from '@/lib/services/geminiService';
 
 /**
  * @desc    Create a new LinkedIn bio
@@ -28,15 +29,19 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Temporary LaTeX wrapper for LinkedIn content to match storage format
-        const resultText = `\\documentclass{article}
-\\begin{document}
-LinkedIn Bio: ${promptData.headline || 'Professional'}
-\\end{document}`;
+        // Generate LinkedIn bio content using Gemini service
+        let bioContent: string;
+        try {
+            bioContent = await generateLinkedInBio(promptData, user);
+        } catch (geminiError) {
+            console.error('Gemini generation failed, using fallback:', geminiError);
+            // Use fallback generator if Gemini fails
+            bioContent = getLinkedInBioFallback(promptData.profile || {});
+        }
 
-        if (!resultText || !resultText.includes('\\documentclass')) {
+        if (!bioContent) {
             return NextResponse.json(
-                { success: false, error: 'Failed to generate valid LaTeX content' },
+                { success: false, error: 'Failed to generate LinkedIn bio content' },
                 { status: 500 }
             );
         }
@@ -45,7 +50,7 @@ LinkedIn Bio: ${promptData.headline || 'Professional'}
             user: user._id,
             title,
             promptData,
-            resultText,
+            resultText: bioContent,
         });
 
         await user.incrementUsage('linkedin');

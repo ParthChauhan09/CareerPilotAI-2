@@ -3,6 +3,7 @@ import connectDB from '@/lib/db';
 import CoverLetter from '@/models/CoverLetter';
 import { protect, checkUsageLimit } from '@/lib/middleware/auth';
 import { handleError } from '@/lib/middleware/errorHandler';
+import { generateCoverLetter, getCoverLetterFallback } from '@/lib/services/geminiService';
 
 /**
  * @desc    Create a new cover letter
@@ -28,11 +29,15 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		// TODO: integrate Gemini LaTeX generation for cover letter
-		const resultText = `\\documentclass{article}
-\\begin{document}
-Cover Letter for ${promptData.jobTitle || 'Position'} at ${promptData.companyName || 'Company'}
-\\end{document}`;
+		// Generate cover letter LaTeX content using Gemini service
+		let resultText: string;
+		try {
+			resultText = await generateCoverLetter(promptData, user);
+		} catch (geminiError) {
+			console.error('Gemini generation failed, using fallback:', geminiError);
+			// Use fallback generator if Gemini fails
+			resultText = getCoverLetterFallback(promptData);
+		}
 
 		if (!resultText || !resultText.includes('\\documentclass')) {
 			return NextResponse.json(

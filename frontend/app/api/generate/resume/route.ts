@@ -3,6 +3,7 @@ import connectDB from '@/lib/db';
 import Resume from '@/models/Resume';
 import { protect, checkUsageLimit } from '@/lib/middleware/auth';
 import { handleError } from '@/lib/middleware/errorHandler';
+import { generateResume, getResumeFallback } from '@/lib/services/geminiService';
 
 /**
  * @desc    Generate a new resume
@@ -36,16 +37,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // TODO: Generate resume LaTeX content using Gemini service
-    // For now, we'll use a placeholder
-    const resultText = `\\documentclass{article}
-\\begin{document}
-Resume for ${promptData.jobTitle || 'Position'}
-\\end{document}`;
-
-    // Note: You'll need to implement the Gemini service integration
-    // import { generateResume } from '@/lib/utils/geminiServiceLatex';
-    // const resultText = await generateResume(promptData, user);
+    // Generate resume LaTeX content using Gemini service
+    let resultText: string;
+    try {
+      resultText = await generateResume(promptData, user);
+    } catch (geminiError) {
+      console.error('Gemini generation failed, using fallback:', geminiError);
+      // Use fallback generator if Gemini fails
+      resultText = getResumeFallback(promptData);
+    }
 
     // Validate LaTeX content
     if (!resultText || !resultText.includes('\\documentclass')) {
