@@ -308,27 +308,28 @@ export function CreateDocumentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
+      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col p-0 sm:p-6 gap-0 sm:gap-4">
+        <DialogHeader className="px-4 py-4 sm:px-0 sm:py-0 border-b sm:border-0">
           <DialogTitle>{getTitle()}</DialogTitle>
           <DialogDescription>{getDescription()}</DialogDescription>
         </DialogHeader>
 
-        <div className="py-2">
-          <div className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto pr-1 pb-2">
+        <div className="flex-1 overflow-y-auto px-4 py-2 sm:px-0">
+          <div className="space-y-4 pb-4">
             {renderForm()}
           </div>
         </div>
 
-        <DialogFooter className="border-t pt-4 mt-2">
+        <DialogFooter className="px-4 py-4 sm:px-0 sm:py-0 border-t sm:border-0 bg-background sm:bg-transparent mt-auto">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={loading}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
-          <Button type="submit" onClick={handleSubmit} disabled={loading}>
+          <Button type="submit" onClick={handleSubmit} disabled={loading} className="w-full sm:w-auto">
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -7,7 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    // unoptimized: true, // Enabled image optimization
   },
   // Force dynamic rendering to avoid React 19 SSG issues
   experimental: {

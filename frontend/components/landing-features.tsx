@@ -59,18 +59,18 @@ export function LandingFeatures() {
   ]
 
   return (
-    <section id="features" className="relative w-full py-8 md:py-16 lg:py-24 overflow-hidden">
+    <section id="features" className="relative w-full py-16 md:py-24 lg:py-32 overflow-hidden">
       {/* Background pattern */}
-      <div className="absolute inset-0 -z-10 bg-muted/40" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] dark:bg-[radial-gradient(#1f2937_1px,transparent_1px)]" />
+      <div className="absolute inset-0 -z-10 bg-muted/30" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] dark:bg-[radial-gradient(#1f2937_1px,transparent_1px)] opacity-50" />
 
-      <div className="w-full max-w-none px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2 animate-fade-in">
-            <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-6">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
+          <div className="space-y-4 animate-fade-in">
+            <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
               Features
             </div>
-            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+            <h2 className="text-3xl font-bold tracking-tighter md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
               Everything You Need for Your Job Search
             </h2>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed animate-fade-in [animation-delay:200ms]">
@@ -79,21 +79,22 @@ export function LandingFeatures() {
             </p>
           </div>
         </div>
-        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
+
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
             <div
               key={index}
               className={cn(
-                "group flex flex-col items-center space-y-4 rounded-lg border p-6 transition-all duration-200 hover:shadow-md hover:border-primary/20 hover:bg-accent/50",
+                "glass-card group flex flex-col items-start space-y-4 rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1",
                 "animate-fade-in [animation-delay:var(--delay)]"
               )}
               style={{ "--delay": `${(index + 1) * 100}ms` } as React.CSSProperties}
             >
-              <div className="rounded-full bg-primary/10 p-4 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary/20">
+              <div className="rounded-xl bg-primary/10 p-4 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary/20 group-hover:shadow-lg group-hover:shadow-primary/10">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold">{feature.title}</h3>
-              <p className="text-center text-muted-foreground">
+              <h3 className="text-xl font-bold group-hover:text-primary transition-colors">{feature.title}</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 {feature.description}
               </p>
             </div>
@@ -101,13 +102,13 @@ export function LandingFeatures() {
         </div>
 
         {/* How It Works Section */}
-        <div className="mt-20">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2 animate-fade-in">
-              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+        <div className="mt-32">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
+            <div className="space-y-4 animate-fade-in">
+              <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
                 How It Works
               </div>
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
                 Simple Process, Powerful Results
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed animate-fade-in [animation-delay:200ms]">
@@ -116,50 +117,55 @@ export function LandingFeatures() {
             </div>
           </div>
 
-          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 relative">
+            {/* Connecting line for desktop */}
+            <div className="absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary/20 to-transparent hidden lg:block -z-10"></div>
+
             {howItWorks.map((step, index) => (
               <div
                 key={index}
                 className="relative flex flex-col items-center p-6 animate-fade-in [animation-delay:var(--delay)]"
                 style={{ "--delay": `${(index + 1) * 150}ms` } as React.CSSProperties}
               >
-                {/* Connector line */}
-                {index < howItWorks.length - 1 && (
-                  <div className="absolute top-8 left-[calc(50%)] h-0.5 w-[calc(100%-2rem)] bg-gradient-to-r from-primary/50 to-transparent hidden lg:block"></div>
-                )}
-                <div className="relative mb-4">
-                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-sm"></div>
-                  <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full border-2 border-primary/50 bg-background text-2xl font-bold text-primary">
+                <div className="relative mb-6 group">
+                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-md group-hover:blur-lg transition-all duration-300"></div>
+                  <div className="relative z-10 flex h-24 w-24 items-center justify-center rounded-full border-4 border-background bg-card text-3xl font-bold text-primary shadow-xl group-hover:scale-110 transition-transform duration-300">
                     {step.number}
                   </div>
                 </div>
-                <h3 className="mb-2 text-xl font-bold">{step.title}</h3>
-                <p className="text-center text-muted-foreground">{step.description}</p>
+                <h3 className="mb-3 text-xl font-bold">{step.title}</h3>
+                <p className="text-center text-muted-foreground leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Benefits Section */}
-        <div className="mt-24 grid grid-cols-1 gap-8 md:grid-cols-3">
-          <div className="flex flex-col items-center space-y-4 rounded-lg border p-6 transition-all duration-200 hover:shadow-md animate-fade-in">
-            <Zap className="h-10 w-10 text-primary" />
+        <div className="mt-32 grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div className="flex flex-col items-center space-y-4 rounded-2xl border border-border/50 bg-card/50 p-8 text-center transition-all duration-300 hover:shadow-lg hover:border-primary/20 animate-fade-in">
+            <div className="p-3 rounded-full bg-orange-500/10 text-orange-500 mb-2">
+              <Zap className="h-8 w-8" />
+            </div>
             <h3 className="text-xl font-bold">Fast & Efficient</h3>
-            <p className="text-center text-muted-foreground">
+            <p className="text-muted-foreground">
               Generate professional documents in seconds, not hours. Save time and focus on your job search.
             </p>
           </div>
-          <div className="flex flex-col items-center space-y-4 rounded-lg border p-6 transition-all duration-200 hover:shadow-md animate-fade-in [animation-delay:150ms]">
-            <Shield className="h-10 w-10 text-primary" />
+          <div className="flex flex-col items-center space-y-4 rounded-2xl border border-border/50 bg-card/50 p-8 text-center transition-all duration-300 hover:shadow-lg hover:border-primary/20 animate-fade-in [animation-delay:150ms]">
+            <div className="p-3 rounded-full bg-blue-500/10 text-blue-500 mb-2">
+              <Shield className="h-8 w-8" />
+            </div>
             <h3 className="text-xl font-bold">Secure & Private</h3>
-            <p className="text-center text-muted-foreground">
+            <p className="text-muted-foreground">
               Your data is encrypted and never shared. We prioritize your privacy and security.
             </p>
           </div>
-          <div className="flex flex-col items-center space-y-4 rounded-lg border p-6 transition-all duration-200 hover:shadow-md animate-fade-in [animation-delay:300ms]">
-            <Clock className="h-10 w-10 text-primary" />
+          <div className="flex flex-col items-center space-y-4 rounded-2xl border border-border/50 bg-card/50 p-8 text-center transition-all duration-300 hover:shadow-lg hover:border-primary/20 animate-fade-in [animation-delay:300ms]">
+            <div className="p-3 rounded-full bg-green-500/10 text-green-500 mb-2">
+              <Clock className="h-8 w-8" />
+            </div>
             <h3 className="text-xl font-bold">Always Available</h3>
-            <p className="text-center text-muted-foreground">
+            <p className="text-muted-foreground">
               Access your documents anytime, anywhere. Make updates and generate new versions whenever needed.
             </p>
           </div>
