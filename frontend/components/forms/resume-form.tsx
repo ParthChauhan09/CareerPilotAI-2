@@ -34,7 +34,7 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="title">Resume Title</Label>
         <Input
@@ -42,6 +42,7 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
           placeholder="Software Developer Resume"
           value={data.title}
           onChange={(e) => handleChange("title", e.target.value)}
+          className="text-base sm:text-sm"
         />
       </div>
 
@@ -52,6 +53,7 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
           placeholder="Senior Software Engineer"
           value={data.promptData.jobTitle}
           onChange={(e) => handleChange("jobTitle", e.target.value)}
+          className="text-base sm:text-sm"
         />
       </div>
 
@@ -62,6 +64,7 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
           placeholder="JavaScript, React, Node.js, TypeScript"
           value={data.promptData.skills.join(", ")}
           onChange={(e) => handleChange("skills", e.target.value)}
+          className="text-base sm:text-sm"
         />
       </div>
 
@@ -70,7 +73,7 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
         <Textarea
           id="experience"
           placeholder="Briefly describe your work experience, achievements, and responsibilities"
-          className="min-h-[80px] max-h-[150px]"
+          className="min-h-[100px] max-h-[200px] text-base sm:text-sm"
           value={data.promptData.experience}
           onChange={(e) => handleChange("experience", e.target.value)}
         />
@@ -81,7 +84,7 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
         <Textarea
           id="education"
           placeholder="List your educational background, degrees, certifications"
-          className="min-h-[60px] max-h-[120px]"
+          className="min-h-[80px] max-h-[150px] text-base sm:text-sm"
           value={data.promptData.education}
           onChange={(e) => handleChange("education", e.target.value)}
         />
@@ -92,7 +95,7 @@ export function ResumeForm({ data, onChange }: ResumeFormProps) {
         <Textarea
           id="additionalInfo"
           placeholder="Any other information you'd like to include"
-          className="min-h-[60px] max-h-[120px]"
+          className="min-h-[80px] max-h-[150px] text-base sm:text-sm"
           value={data.promptData.additionalInfo}
           onChange={(e) => handleChange("additionalInfo", e.target.value)}
         />
