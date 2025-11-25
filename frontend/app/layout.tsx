@@ -9,7 +9,7 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 // Force dynamic rendering to avoid SSG issues
-export const dynamic = 'force-dynamic'
+
 
 export const metadata: Metadata = {
   title: "CareerPilotAI",

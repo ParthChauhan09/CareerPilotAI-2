@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import {
   Card,
@@ -92,9 +92,8 @@ export function DocumentList({
       case "resume":
         return (
           <div
-            className={`relative flex items-center justify-center rounded-full bg-blue-100 p-2 dark:bg-blue-900/30 ${
-              forCard ? "h-12 w-12" : "h-10 w-10"
-            } ${animationClass}`}
+            className={`relative flex items-center justify-center rounded-full bg-blue-100 p-2 dark:bg-blue-900/30 ${forCard ? "h-12 w-12" : "h-10 w-10"
+              } ${animationClass}`}
           >
             <FileText
               className={`${baseClass} text-blue-600 dark:text-blue-400`}
@@ -104,9 +103,8 @@ export function DocumentList({
       case "coverLetter":
         return (
           <div
-            className={`relative flex items-center justify-center rounded-full bg-purple-100 p-2 dark:bg-purple-900/30 ${
-              forCard ? "h-12 w-12" : "h-10 w-10"
-            } ${animationClass}`}
+            className={`relative flex items-center justify-center rounded-full bg-purple-100 p-2 dark:bg-purple-900/30 ${forCard ? "h-12 w-12" : "h-10 w-10"
+              } ${animationClass}`}
           >
             <FileText
               className={`${baseClass} text-purple-600 dark:text-purple-400`}
@@ -116,9 +114,8 @@ export function DocumentList({
       case "linkedin":
         return (
           <div
-            className={`relative flex items-center justify-center rounded-full bg-indigo-100 p-2 dark:bg-indigo-900/30 ${
-              forCard ? "h-12 w-12" : "h-10 w-10"
-            } ${animationClass}`}
+            className={`relative flex items-center justify-center rounded-full bg-indigo-100 p-2 dark:bg-indigo-900/30 ${forCard ? "h-12 w-12" : "h-10 w-10"
+              } ${animationClass}`}
           >
             <FileText
               className={`${baseClass} text-indigo-600 dark:text-indigo-400`}
@@ -128,9 +125,8 @@ export function DocumentList({
       default:
         return (
           <div
-            className={`relative flex items-center justify-center rounded-full bg-primary/10 p-2 ${
-              forCard ? "h-12 w-12" : "h-10 w-10"
-            } ${animationClass}`}
+            className={`relative flex items-center justify-center rounded-full bg-primary/10 p-2 ${forCard ? "h-12 w-12" : "h-10 w-10"
+              } ${animationClass}`}
           >
             <FileText className={`${baseClass} text-primary`} />
           </div>
@@ -416,15 +412,18 @@ export function DocumentList({
     }
   };
 
-  const filteredDocuments = documents.filter((doc) => {
-    const title = getDocumentTitle(doc).toLowerCase();
-    return title.includes(effectiveSearchQuery.toLowerCase());
-  });
+  const filteredDocuments = useMemo(() => {
+    return documents.filter((doc) => {
+      const title = getDocumentTitle(doc).toLowerCase();
+      return title.includes(effectiveSearchQuery.toLowerCase());
+    });
+  }, [documents, effectiveSearchQuery]);
 
   // Only sort internally if we're not using external sorting (hideSort is false)
-  const sortedDocuments = hideSort
-    ? filteredDocuments // Use the documents as they were passed (already sorted by parent)
-    : [...filteredDocuments].sort((a, b) => {
+  const sortedDocuments = useMemo(() => {
+    return hideSort
+      ? filteredDocuments // Use the documents as they were passed (already sorted by parent)
+      : [...filteredDocuments].sort((a, b) => {
         try {
           if (sortBy === "updatedAt") {
             const dateA = new Date(getDocumentDate(a)).getTime();
@@ -441,6 +440,7 @@ export function DocumentList({
           return 0; // Keep original order if there's an error
         }
       });
+  }, [filteredDocuments, hideSort, sortBy]);
 
   const handleDeleteClick = (id: string) => {
     setDocumentToDelete(id);
@@ -730,7 +730,7 @@ export function DocumentList({
                           {typeof content === "string"
                             ? content.length > 150
                               ? content.substring(0, 150).replace(/\n/g, " ") +
-                                "..."
+                              "..."
                               : content.replace(/\n/g, " ")
                             : null}
                         </div>
@@ -745,20 +745,17 @@ export function DocumentList({
                 <Badge
                   variant="outline"
                   className={`
-                    ${
-                      type === "resume"
-                        ? "border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
-                        : ""
+                    ${type === "resume"
+                      ? "border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
+                      : ""
                     }
-                    ${
-                      type === "coverLetter"
-                        ? "border-purple-200 bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800"
-                        : ""
+                    ${type === "coverLetter"
+                      ? "border-purple-200 bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800"
+                      : ""
                     }
-                    ${
-                      type === "linkedin"
-                        ? "border-indigo-200 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800"
-                        : ""
+                    ${type === "linkedin"
+                      ? "border-indigo-200 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800"
+                      : ""
                     }
                   `}
                 >

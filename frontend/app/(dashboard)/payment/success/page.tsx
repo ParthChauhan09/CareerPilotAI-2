@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { DashboardHeader } from "@/components/dashboard-header"
@@ -9,14 +9,14 @@ import { Button } from "@/components/ui/button"
 import { CheckCircle, ArrowRight, Home } from "lucide-react"
 import Link from "next/link"
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [paymentId, setPaymentId] = useState<string | null>(null)
 
   useEffect(() => {
     // Get payment ID from URL parameters if available
-    const razorpayPaymentId = searchParams.get("razorpay_payment_id")
+    const razorpayPaymentId = searchParams?.get("razorpay_payment_id")
     if (razorpayPaymentId) {
       setPaymentId(razorpayPaymentId)
     }
@@ -47,7 +47,7 @@ export default function PaymentSuccessPage() {
                 <p className="font-mono text-sm">{paymentId}</p>
               </div>
             )}
-            
+
             <div className="space-y-2">
               <Button asChild className="w-full">
                 <Link href="/subscription">
@@ -55,7 +55,7 @@ export default function PaymentSuccessPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              
+
               <Button variant="outline" asChild className="w-full">
                 <Link href="/dashboard">
                   <Home className="mr-2 h-4 w-4" />
@@ -71,5 +71,13 @@ export default function PaymentSuccessPage() {
         </Card>
       </div>
     </DashboardShell>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }
