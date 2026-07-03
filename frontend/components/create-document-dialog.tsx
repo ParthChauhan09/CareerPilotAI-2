@@ -308,19 +308,17 @@ export function CreateDocumentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col p-0 sm:p-6 gap-0 sm:gap-4">
-        <DialogHeader className="px-4 py-4 sm:px-0 sm:py-0 border-b sm:border-0">
+      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
+        <DialogHeader className="px-6 py-5 border-b text-left">
           <DialogTitle>{getTitle()}</DialogTitle>
-          <DialogDescription>{getDescription()}</DialogDescription>
+          <DialogDescription className="mt-1.5">{getDescription()}</DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto px-4 py-2 sm:px-0">
-          <div className="space-y-4 pb-4">
-            {renderForm()}
-          </div>
+        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 pt-4 pr-7">
+          {renderForm()}
         </div>
 
-        <DialogFooter className="px-4 py-4 sm:px-0 sm:py-0 border-t sm:border-0 bg-background sm:bg-transparent mt-auto">
+        <DialogFooter className="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2 mt-auto">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
