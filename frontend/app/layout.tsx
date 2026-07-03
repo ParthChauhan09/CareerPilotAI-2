@@ -5,6 +5,7 @@ import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/lib/auth-context"
 import { Toaster } from "@/components/ui/toaster"
+import QueryProvider from "@/components/providers/query-provider"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" })
@@ -26,12 +27,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${outfit.variable} font-sans antialiased transition-colors duration-300`}>
         <AuthProvider>
-          <ThemeProvider>
-            <div className="animate-fade-in [animation-delay:100ms] transition-all duration-300 w-full">
-              {children}
-            </div>
-            <Toaster />
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider>
+              <div className="animate-fade-in [animation-delay:100ms] transition-all duration-300 w-full">
+                {children}
+              </div>
+              <Toaster />
+            </ThemeProvider>
+          </QueryProvider>
         </AuthProvider>
       </body>
     </html>

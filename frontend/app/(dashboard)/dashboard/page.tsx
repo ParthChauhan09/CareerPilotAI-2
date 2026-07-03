@@ -29,6 +29,8 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
+import { useResumes, useCoverLetters, useLinkedInBios, queryKeys } from "@/hooks/use-documents-query";
+import { useQueryClient } from "@tanstack/react-query";
 import type {
   DocumentType,
   Resume,
@@ -123,25 +125,22 @@ function DashboardWelcome({
 function DashboardContent() {
   const { isAuthenticated, loading: authLoading, user } = useAuth();
   const searchParams = useSearchParams();
-  const tabParam = searchParams.get("tab") as DocumentType | null;
+  const tabParam = searchParams?.get("tab") as DocumentType | null;
+  const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState<DocumentType>(
     tabParam || "resume"
   );
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [resumes, setResumes] = useState<Resume[]>([]);
-  const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([]);
-  const [linkedinBios, setLinkedinBios] = useState<LinkedInBio[]>([]);
-  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const { toast } = useToast();
 
-  // Initial data fetch
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      fetchDocuments();
-    }
-  }, [authLoading, isAuthenticated]);
+  // React Query queries
+  const { data: resumes = [], isLoading: resumesLoading } = useResumes();
+  const { data: coverLetters = [], isLoading: coverLettersLoading } = useCoverLetters();
+  const { data: linkedinBios = [], isLoading: linkedinBiosLoading } = useLinkedInBios();
+
+  const loading = resumesLoading || coverLettersLoading || linkedinBiosLoading;
 
   // Handle URL query parameters for tab selection
   useEffect(() => {
@@ -150,47 +149,27 @@ function DashboardContent() {
     }
   }, [tabParam]);
 
-  // No longer needed with separate pages
-
   const fetchDocuments = async () => {
-    setLoading(true);
     setRefreshing(true);
     try {
-      // Fetch all document types in parallel
-      const [resumesRes, coverLettersRes, linkedinBiosRes] = await Promise.all([
-        resumeAPI.getAllResumes(),
-        coverLetterAPI.getAllCoverLetters(),
-        linkedinAPI.getAllLinkedInBios(),
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.resumes }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.coverLetters }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.linkedinBios }),
       ]);
-
-      // Extract data from responses
-      const resumeData = resumesRes.data.resumes || resumesRes.data.data || [];
-      const coverLetterData =
-        coverLettersRes.data.coverLetters || coverLettersRes.data.data || [];
-      const linkedinData =
-        linkedinBiosRes.data.linkedinBios || linkedinBiosRes.data.data || [];
-
-      setResumes(resumeData);
-      setCoverLetters(coverLetterData);
-      setLinkedinBios(linkedinData);
     } catch (error) {
       toast({
-        title: "Error fetching documents",
+        title: "Error refreshing documents",
         description: "Please try again later",
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   };
 
-  // No longer needed with separate pages
-
   const handleDocumentCreated = () => {
-    fetchDocuments();
     setIsCreateDialogOpen(false);
-
     toast({
       title: "Document created",
       description: "Your document has been created successfully",
@@ -471,7 +450,6 @@ function DashboardContent() {
           onOpenChange={setIsCreateDialogOpen}
           documentType={activeTab}
           onDocumentCreated={handleDocumentCreated}
-          className="animate-fade-in"
         />
       </div>
     </DashboardShell>

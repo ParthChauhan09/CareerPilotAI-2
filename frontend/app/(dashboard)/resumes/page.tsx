@@ -20,6 +20,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useResumes, useDeleteDocument, queryKeys } from "@/hooks/use-documents-query";
+import { useQueryClient } from "@tanstack/react-query";
 import type { Resume } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import {
@@ -61,37 +63,29 @@ function ResumeStats({
 export default function ResumesPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [resumes, setResumes] = useState<Resume[]>([]);
-  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<
     "newest" | "oldest" | "a-z" | "z-a"
   >("newest");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Initial data fetch
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      fetchResumes();
-    }
-  }, [authLoading, isAuthenticated]);
+  // Queries & Mutations
+  const { data: resumes = [], isLoading: loading } = useResumes();
+  const deleteMutation = useDeleteDocument();
 
   const fetchResumes = async () => {
-    setLoading(true);
     setRefreshing(true);
     try {
-      const response = await resumeAPI.getAllResumes();
-      const resumeData = response.data.resumes || response.data.data || [];
-      setResumes(resumeData);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.resumes });
     } catch (error) {
       toast({
-        title: "Error fetching resumes",
+        title: "Error refreshing resumes",
         description: "Please try again later",
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   };
@@ -101,9 +95,7 @@ export default function ResumesPage() {
   };
 
   const handleResumeCreated = () => {
-    fetchResumes();
     setIsCreateDialogOpen(false);
-
     toast({
       title: "Resume created",
       description: "Your resume has been created successfully",
@@ -113,9 +105,7 @@ export default function ResumesPage() {
 
   const handleDeleteResume = async (id: string) => {
     try {
-      await resumeAPI.deleteResume(id);
-      setResumes(resumes.filter((resume) => resume.id !== id));
-
+      await deleteMutation.mutateAsync({ type: "resume", id });
       toast({
         title: "Resume deleted",
         description: "Your resume has been deleted successfully",
@@ -133,10 +123,8 @@ export default function ResumesPage() {
   const filteredResumes = resumes.filter(
     (resume) =>
       resume.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (resume.jobTitle &&
-        resume.jobTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (resume.company &&
-        resume.company.toLowerCase().includes(searchQuery.toLowerCase()))
+      (resume.promptData?.jobTitle &&
+        resume.promptData.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const sortedResumes = [...filteredResumes].sort((a, b) => {

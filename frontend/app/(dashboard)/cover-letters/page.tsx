@@ -20,6 +20,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useCoverLetters, useDeleteDocument, queryKeys } from "@/hooks/use-documents-query";
+import { useQueryClient } from "@tanstack/react-query";
 import type { CoverLetter } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import {
@@ -61,49 +63,29 @@ function CoverLetterStats({
 export default function CoverLettersPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [coverLetters, setCoverLetters] = useState<CoverLetter[]>([]);
-  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<
     "newest" | "oldest" | "a-z" | "z-a"
   >("newest");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Initial data fetch
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      fetchCoverLetters();
-    }
-  }, [authLoading, isAuthenticated]);
+  // Queries & Mutations
+  const { data: coverLetters = [], isLoading: loading } = useCoverLetters();
+  const deleteMutation = useDeleteDocument();
 
   const fetchCoverLetters = async () => {
-    setLoading(true);
     setRefreshing(true);
     try {
-      const response = await coverLetterAPI.getAllCoverLetters();
-
-      // Try to get data from different possible locations in the response
-      let coverLetterData = [];
-      if (
-        response.data.coverLetters &&
-        Array.isArray(response.data.coverLetters)
-      ) {
-        coverLetterData = response.data.coverLetters;
-      } else if (response.data.data && Array.isArray(response.data.data)) {
-        coverLetterData = response.data.data;
-      } else if (Array.isArray(response.data)) {
-        coverLetterData = response.data;
-      }
-      setCoverLetters(coverLetterData);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.coverLetters });
     } catch (error) {
       toast({
-        title: "Error fetching cover letters",
+        title: "Error refreshing cover letters",
         description: "Please try again later",
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   };
@@ -113,9 +95,7 @@ export default function CoverLettersPage() {
   };
 
   const handleCoverLetterCreated = () => {
-    fetchCoverLetters();
     setIsCreateDialogOpen(false);
-
     toast({
       title: "Cover letter created",
       description: "Your cover letter has been created successfully",
@@ -125,9 +105,7 @@ export default function CoverLettersPage() {
 
   const handleDeleteCoverLetter = async (id: string) => {
     try {
-      await coverLetterAPI.deleteCoverLetter(id);
-      setCoverLetters(coverLetters.filter((letter) => letter.id !== id));
-
+      await deleteMutation.mutateAsync({ type: "coverLetter", id });
       toast({
         title: "Cover letter deleted",
         description: "Your cover letter has been deleted successfully",

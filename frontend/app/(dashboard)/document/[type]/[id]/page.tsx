@@ -22,14 +22,14 @@ import { PDFPreview } from "@/components/pdf-preview";
 import type { DocumentType } from "@/lib/types";
 import { useExport } from "@/hooks/use-export";
 
+import { useDocument } from "@/hooks/use-documents-query";
+
 export default function DocumentPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
   const { exportToPDF, exportToTXT, isExporting } = useExport();
 
-  const [document, setDocument] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("preview");
 
@@ -50,9 +50,10 @@ export default function DocumentPage() {
       ? "linkedin"
       : "resume"; // Default to resume if unknown type
 
-  useEffect(() => {
-    fetchDocument();
+  // React Query queries
+  const { data: document, isLoading: loading, error } = useDocument(documentType, id);
 
+  useEffect(() => {
     // Check URL for tab parameter
     const url = new URL(window.location.href);
     const tabParam = url.searchParams.get("tab");
@@ -61,78 +62,20 @@ export default function DocumentPage() {
     }
   }, [type, id]);
 
-  const fetchDocument = async () => {
-    setLoading(true);
-    try {
-      let response;
-
-      // Validate MongoDB ID format
-      const isValidMongoId = /^[0-9a-fA-F]{24}$/.test(id);
-      if (!isValidMongoId) {
-        throw new Error(`Invalid document ID format: ${id}`);
-      }
-
-      if (type === "resume") {
-        response = await resumeAPI.getResume(id);
-      } else if (type === "cover-letter") {
-        try {
-          response = await coverLetterAPI.getCoverLetter(id);
-        } catch (err: any) {
-          throw new Error(
-            `Failed to fetch cover letter: ${err?.message || "Unknown error"}`
-          );
-        }
-      } else if (type === "linkedin") {
-        response = await linkedinAPI.getLinkedInBio(id);
-      } else {
-        throw new Error(`Unknown document type: ${type}`);
-      }
-
-      // Extract the document data from the response
-      let documentData = null;
-
-      if (response?.data?.resume) {
-        documentData = response.data.resume;
-      } else if (response?.data?.coverLetter) {
-        documentData = response.data.coverLetter;
-      } else if (response?.data?.linkedinBio) {
-        documentData = response.data.linkedinBio;
-      } else if (response?.data) {
-        documentData = response.data;
-
-        if (
-          type === "cover-letter" &&
-          !documentData.resultText &&
-          !documentData.coverLetter
-        ) {
-          documentData = { coverLetter: documentData };
-        }
-      }
-
-      if (!documentData) {
-        throw new Error("No document data found in response");
-      }
-
-      setDocument(documentData);
-    } catch (error: any) {
+  useEffect(() => {
+    if (error) {
       toast({
         title: "Error fetching document",
-        description: `Could not load the document: ${
-          error?.message || "Unknown error"
-        }. Please try again.`,
+        description: `Could not load the document. Please try again.`,
         variant: "destructive",
       });
-
       setTimeout(() => {
         router.push("/dashboard");
       }, 3000);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [error, toast, router]);
 
   const handleDocumentUpdated = () => {
-    fetchDocument();
     setIsEditDialogOpen(false);
   };
 

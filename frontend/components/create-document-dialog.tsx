@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ResumeForm } from "@/components/forms/resume-form";
 import { CoverLetterForm } from "@/components/forms/cover-letter-form";
 import { LinkedInForm } from "@/components/forms/linkedin-form";
-import { resumeAPI, coverLetterAPI, linkedinAPI } from "@/lib/api";
+import { useCreateDocument } from "@/hooks/use-documents-query";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import type {
@@ -37,8 +37,9 @@ export function CreateDocumentDialog({
   documentType,
   onDocumentCreated,
 }: CreateDocumentDialogProps) {
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const createMutation = useCreateDocument();
+  const loading = createMutation.isPending;
 
   // Form states
   const [resumeData, setResumeData] = useState<ResumeFormData>({
@@ -187,16 +188,14 @@ export function CreateDocumentDialog({
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    setLoading(true);
     try {
-      let response;
-
+      let dataToSubmit;
       if (documentType === "resume") {
-        response = await resumeAPI.generateResume(resumeData);
+        dataToSubmit = resumeData;
       } else if (documentType === "coverLetter") {
-        response = await coverLetterAPI.generateCoverLetter(coverLetterData);
+        dataToSubmit = coverLetterData;
       } else if (documentType === "linkedin") {
-        response = await linkedinAPI.generateLinkedInBio({
+        dataToSubmit = {
           title: linkedinData.title,
           profile: {
             firstName: linkedinData.profile.firstName,
@@ -219,8 +218,10 @@ export function CreateDocumentDialog({
             focusPoints: linkedinData.preferences.focusPoints,
             keywords: linkedinData.preferences.keywords,
           },
-        });
+        };
       }
+
+      await createMutation.mutateAsync({ type: documentType, data: dataToSubmit });
 
       // Reset form data
       setResumeData({
@@ -283,8 +284,6 @@ export function CreateDocumentDialog({
         description: errorMessage,
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 

@@ -64,7 +64,7 @@ export default function CancellationRefundPage() {
             <p className="mb-4">To cancel or downgrade your account:</p>
             <ol className="list-decimal pl-6">
               <li>Log into your CareerPilotAI account</li>
-              <li>Go to Settings > Account Management</li>
+              <li>Go to Settings &gt; Account Management</li>
               <li>Select "Downgrade to Free" or "Delete Account"</li>
               <li>Follow the confirmation process</li>
               <li>Or contact our support team at support@careerpilotai.com</li>

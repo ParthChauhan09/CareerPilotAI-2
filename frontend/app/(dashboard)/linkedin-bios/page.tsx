@@ -25,6 +25,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useLinkedInBios, useDeleteDocument, queryKeys } from "@/hooks/use-documents-query";
+import { useQueryClient } from "@tanstack/react-query";
 import type { LinkedInBio } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import {
@@ -66,38 +68,29 @@ function LinkedInBioStats({
 export default function LinkedInBiosPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [linkedinBios, setLinkedinBios] = useState<LinkedInBio[]>([]);
-  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<
     "newest" | "oldest" | "a-z" | "z-a"
   >("newest");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Initial data fetch
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      fetchLinkedInBios();
-    }
-  }, [authLoading, isAuthenticated]);
+  // Queries & Mutations
+  const { data: linkedinBios = [], isLoading: loading } = useLinkedInBios();
+  const deleteMutation = useDeleteDocument();
 
   const fetchLinkedInBios = async () => {
-    setLoading(true);
     setRefreshing(true);
     try {
-      const response = await linkedinAPI.getAllLinkedInBios();
-      const linkedinData =
-        response.data.linkedinBios || response.data.data || [];
-      setLinkedinBios(linkedinData);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.linkedinBios });
     } catch (error) {
       toast({
-        title: "Error fetching LinkedIn bios",
+        title: "Error refreshing LinkedIn bios",
         description: "Please try again later",
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   };
@@ -107,9 +100,7 @@ export default function LinkedInBiosPage() {
   };
 
   const handleLinkedInBioCreated = () => {
-    fetchLinkedInBios();
     setIsCreateDialogOpen(false);
-
     toast({
       title: "LinkedIn bio created",
       description: "Your LinkedIn bio has been created successfully",
@@ -119,9 +110,7 @@ export default function LinkedInBiosPage() {
 
   const handleDeleteLinkedInBio = async (id: string) => {
     try {
-      await linkedinAPI.deleteLinkedInBio(id);
-      setLinkedinBios(linkedinBios.filter((bio) => bio.id !== id));
-
+      await deleteMutation.mutateAsync({ type: "linkedin", id });
       toast({
         title: "LinkedIn bio deleted",
         description: "Your LinkedIn bio has been deleted successfully",

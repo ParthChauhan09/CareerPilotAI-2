@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { resumeAPI, coverLetterAPI, linkedinAPI } from "@/lib/api"
+import { useUpdateDocument } from "@/hooks/use-documents-query"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
 import type { DocumentType } from "@/lib/types"
@@ -33,8 +33,9 @@ export function EditDocumentDialog({
   onDocumentUpdated,
 }: EditDocumentDialogProps) {
   const [title, setTitle] = useState("")
-  const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const updateMutation = useUpdateDocument()
+  const loading = updateMutation.isPending
 
   useEffect(() => {
     if (document) {
@@ -65,15 +66,12 @@ export function EditDocumentDialog({
       return
     }
 
-    setLoading(true)
     try {
-      if (documentType === "resume") {
-        await resumeAPI.updateResume(document.id, { title })
-      } else if (documentType === "coverLetter") {
-        await coverLetterAPI.updateCoverLetter(document.id, { title })
-      } else if (documentType === "linkedin") {
-        await linkedinAPI.updateLinkedInBio(document.id, { title })
-      }
+      await updateMutation.mutateAsync({
+        type: documentType,
+        id: document.id || document._id,
+        data: { title },
+      })
 
       toast({
         title: "Document updated",
@@ -87,8 +85,6 @@ export function EditDocumentDialog({
         description: "There was an error updating your document. Please try again.",
         variant: "destructive",
       })
-    } finally {
-      setLoading(false)
     }
   }
 
